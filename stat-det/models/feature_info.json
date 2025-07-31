@@ -1,0 +1,28 @@
+{
+  "feature_columns": [
+    "mean",
+    "std",
+    "var",
+    "skewness",
+    "kurtosis",
+    "min",
+    "max",
+    "range",
+    "q25",
+    "q75",
+    "iqr",
+    "diff_mean",
+    "diff_std",
+    "diff_var",
+    "diff2_mean",
+    "diff2_std",
+    "acf_1",
+    "acf_5",
+    "trend_slope",
+    "trend_r2",
+    "length"
+  ],
+  "total_samples": 276185,
+  "stationary_samples": 249185,
+  "non_stationary_samples": 27000
+}

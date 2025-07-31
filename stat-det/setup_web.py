@@ -1,0 +1,667 @@
+#!/usr/bin/env python3
+"""
+Web Server Setup Script for Stationarity Detection
+
+This script sets up the web server structure and starts the Flask app.
+"""
+
+import os
+import sys
+from pathlib import Path
+
+def create_web_structure():
+    """Create necessary directories for Flask app"""
+    
+    # Create templates directory
+    templates_dir = Path("templates")
+    templates_dir.mkdir(exist_ok=True)
+    
+    # Create static directory (for future CSS/JS files)
+    static_dir = Path("static")
+    static_dir.mkdir(exist_ok=True)
+    
+    print("✅ Created web directories")
+    return templates_dir, static_dir
+
+def create_html_template(templates_dir):
+    """Create the HTML template file"""
+    
+    template_content = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stationarity Detection ML Web App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .upload-section {
+            background: #f8f9ff;
+            border: 2px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+
+        .upload-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .file-input-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-predict {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-visualize {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .results-content {
+            border: 2px solid #4facfe;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            padding: 20px;
+            background: #f8f9ff;
+        }
+
+        .model-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .model-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .model-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .model-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .prediction-result {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .prediction-label {
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .stationary {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .non-stationary {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .confidence-info {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .series-info {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .visualization-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .visualization-content {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .plot-container {
+            margin-top: 20px;
+        }
+
+        .plot-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .filename-display {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .model-results {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Stationarity Detection</h1>
+            <p>ML-Powered Time Series Analysis with 7 Advanced Models</p>
+        </div>
+
+        <div class="main-content">
+            <div class="upload-section">
+                <h3>📁 Upload Your Time Series Data</h3>
+                <p>Select a CSV file with a 'data' column containing your time series</p>
+                
+                <div class="file-input-wrapper">
+                    <input type="file" id="csvFile" class="file-input" accept=".csv" />
+                    <label for="csvFile" class="file-input-button">Choose CSV File</label>
+                </div>
+                
+                <div class="filename-display" id="filenameDisplay"></div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-predict" id="predictBtn" disabled>
+                        🤖 Predict with All Models
+                    </button>
+                    <button class="btn btn-visualize" id="visualizeBtn" disabled>
+                        📊 Visualize Data
+                    </button>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your data...</p>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <div class="results-section" id="resultsSection">
+                <div class="results-header">
+                    <h2>🎯 Prediction Results</h2>
+                    <p>Results from all 7 ML models</p>
+                </div>
+                <div class="results-content">
+                    <div class="series-info" id="seriesInfo"></div>
+                    <div class="model-results" id="modelResults"></div>
+                </div>
+            </div>
+
+            <div class="visualization-section" id="visualizationSection">
+                <div class="results-header">
+                    <h2>📊 Time Series Visualization</h2>
+                    <p>Comprehensive analysis plots</p>
+                </div>
+                <div class="visualization-content">
+                    <div class="plot-container" id="plotContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const csvFile = document.getElementById('csvFile');
+        const filenameDisplay = document.getElementById('filenameDisplay');
+        const predictBtn = document.getElementById('predictBtn');
+        const visualizeBtn = document.getElementById('visualizeBtn');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+        const resultsSection = document.getElementById('resultsSection');
+        const visualizationSection = document.getElementById('visualizationSection');
+
+        // File selection handler
+        csvFile.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                filenameDisplay.textContent = `Selected: ${file.name}`;
+                predictBtn.disabled = false;
+                visualizeBtn.disabled = false;
+                hideError();
+                hideResults();
+            } else {
+                filenameDisplay.textContent = '';
+                predictBtn.disabled = true;
+                visualizeBtn.disabled = true;
+            }
+        });
+
+        // Prediction handler
+        predictBtn.addEventListener('click', async function() {
+            const file = csvFile.files[0];
+            if (!file) return;
+
+            showLoading();
+            hideError();
+            hideResults();
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                hideLoading();
+
+                if (response.ok) {
+                    displayResults(result);
+                } else {
+                    showError(result.error || 'Prediction failed');
+                }
+            } catch (error) {
+                hideLoading();
+                showError('Network error: ' + error.message);
+            }
+        });
+
+        // Visualization handler
+        visualizeBtn.addEventListener('click', async function() {
+            const file = csvFile.files[0];
+            if (!file) return;
+
+            showLoading();
+            hideError();
+            hideVisualization();
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/visualize', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                hideLoading();
+
+                if (response.ok) {
+                    displayVisualization(result);
+                } else {
+                    showError(result.error || 'Visualization failed');
+                }
+            } catch (error) {
+                hideLoading();
+                showError('Network error: ' + error.message);
+            }
+        });
+
+        function showLoading() {
+            loading.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loading.style.display = 'none';
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        function hideResults() {
+            resultsSection.style.display = 'none';
+        }
+
+        function hideVisualization() {
+            visualizationSection.style.display = 'none';
+        }
+
+        function displayResults(result) {
+            // Display series info
+            const seriesInfo = document.getElementById('seriesInfo');
+            seriesInfo.innerHTML = `
+                <h3>📈 Series Information: ${result.filename}</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Length</div>
+                        <div class="info-value">${result.series_length}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Mean</div>
+                        <div class="info-value">${result.series_stats.mean.toFixed(4)}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Std Dev</div>
+                        <div class="info-value">${result.series_stats.std.toFixed(4)}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Range</div>
+                        <div class="info-value">${(result.series_stats.max - result.series_stats.min).toFixed(4)}</div>
+                    </div>
+                </div>
+            `;
+
+            // Display model results
+            const modelResults = document.getElementById('modelResults');
+            modelResults.innerHTML = '';
+
+            const modelOrder = ['GradientBoosting', 'RandomForest', 'DecisionTree', 'SVM', 'KNN', 'LogisticRegression', 'NaiveBayes'];
+            
+            modelOrder.forEach(modelName => {
+                if (result.predictions[modelName]) {
+                    const prediction = result.predictions[modelName];
+                    const card = document.createElement('div');
+                    card.className = 'model-card';
+                    
+                    const predictionClass = prediction.prediction === 1 ? 'stationary' : 'non-stationary';
+                    const confidenceText = prediction.confidence ? 
+                        `Confidence: ${(prediction.confidence * 100).toFixed(2)}%` : 
+                        'Confidence: N/A';
+                    
+                    card.innerHTML = `
+                        <div class="model-name">${modelName}</div>
+                        <div class="prediction-result">
+                            <div class="prediction-label ${predictionClass}">
+                                ${prediction.prediction_label}
+                            </div>
+                            <div class="confidence-info">${confidenceText}</div>
+                            ${prediction.probability_stationary ? 
+                                `<div class="confidence-info">P(Stationary): ${(prediction.probability_stationary * 100).toFixed(2)}%</div>` : 
+                                ''}
+                        </div>
+                    `;
+                    
+                    modelResults.appendChild(card);
+                }
+            });
+
+            resultsSection.style.display = 'block';
+        }
+
+        function displayVisualization(result) {
+            const plotContainer = document.getElementById('plotContainer');
+            plotContainer.innerHTML = `
+                <h3>📊 Analysis for: ${result.filename}</h3>
+                <p>Series Length: ${result.series_length} points</p>
+                <img src="data:image/png;base64,${result.plot}" alt="Time Series Analysis" />
+            `;
+            
+            visualizationSection.style.display = 'block';
+        }
+    </script>
+</body>
+</html>'''
+    
+    # Write HTML template
+    template_path = templates_dir / "index.html"
+    with open(template_path, 'w', encoding='utf-8') as f:
+        f.write(template_content)
+    
+    print(f"✅ Created HTML template: {template_path}")
+
+def check_web_requirements():
+    """Check if Flask is installed"""
+    try:
+        import flask
+        print("✅ Flask is available")
+        return True
+    except ImportError:
+        print("❌ Flask not found. Installing...")
+        os.system("pip install flask")
+        try:
+            import flask
+            print("✅ Flask installed successfully")
+            return True
+        except ImportError:
+            print("❌ Failed to install Flask")
+            return False
+
+def main():
+    print("🌐 Setting up Stationarity Detection Web Server...")
+    
+    # Check if models exist
+    if not os.path.exists("models/best_model.pkl"):
+        print("❌ No trained models found!")
+        print("Please run 'python run_pipeline.py' first to train the models.")
+        return False
+    
+    # Check Flask
+    if not check_web_requirements():
+        return False
+    
+    # Create web structure
+    templates_dir, static_dir = create_web_structure()
+    
+    # Create HTML template
+    create_html_template(templates_dir)
+    
+    print("\n🎯 Web server setup complete!")
+    print("\nTo start the web server:")
+    print("python app.py")
+    print("\nThen visit: http://localhost:5000")
+    
+    # Ask if user wants to start the server now
+    start_now = input("\nStart the web server now? (y/n): ").lower().strip()
+    if start_now == 'y':
+        print("\n🚀 Starting web server...")
+        os.system("python app.py")
+    
+    return True
+
+if __name__ == "__main__":
+    success = main()
+    if not success:
+        sys.exit(1)

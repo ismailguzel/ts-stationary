@@ -1,0 +1,5 @@
+{
+  "best_model_name": "GradientBoosting",
+  "best_score": 0.9611220737625347,
+  "model_path": "best_model.pkl"
+}
