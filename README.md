@@ -165,12 +165,18 @@ np.random.seed(RANDOM_SEED)
 
 This ensures that running the same code multiple times produces identical results (98-99% reproducibility, with minor variations in ARCH/GARCH models due to library limitations).
 
-## Legacy Code
+## Legacy and Development History
 
-The previous version of this repository has been preserved in the `legacy` branch. You can access it via:
+In addition to the `legacy` branch—which contains the original version of this repository—there is also a `data_generation_evolution` branch. This branch includes all previous code and documents the library's development process.
+
+You can access these branches with:
 
 ```bash
+# Checkout the legacy branch
 git checkout legacy
+
+# Or checkout the data_generation_evolution branch
+git checkout data_generation_evolution
 ```
 
 ## Contributing
@@ -187,7 +193,7 @@ If you use this library in your research, please cite:
 
 ```bibtex
 @software{timeseries_dataset_generator,
-  author = {Guzel, Ismail},
+  author = {TS-Stationary Project Team, TUBITAK 1001 Project No. 124F095},
   title = {Time Series Dataset Generator},
   year = {2025},
   url = {https://github.com/ismailguzel/ts-stationary}
