@@ -408,12 +408,12 @@ generate_ar_dataset(
 df = pd.read_parquet('output/ar.parquet')
 
 # 3. Visualize
-plot_single_series(df, series_id=0, save_path='series.png')
-create_dashboard(df, series_id=0, save_path='dashboard.png')
+plot_single_series(df, series_id=1, save_path='series.png')
+create_dashboard(df, series_id=1, save_path='dashboard.png')
 
 # 4. Analyze
-stationarity = test_stationarity(df, series_id=0)
-seasonality = detect_seasonality(df, series_id=0)
+stationarity = test_stationarity(df, series_id=1)
+seasonality = detect_seasonality(df, series_id=1)
 
 print(f"Stationary: {stationarity['is_stationary']}")
 print(f"Seasonal: {seasonality['has_seasonality']}")
