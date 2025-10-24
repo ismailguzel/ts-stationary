@@ -85,6 +85,9 @@ python examples/dataset_updated.py
 ### Quick Examples
 
 ```bash
+# Interactive tutorial (recommended for beginners)
+jupyter notebook examples/quick_start.ipynb
+
 # Generate sample datasets
 python examples/simple_generation.py
 
@@ -166,7 +169,9 @@ summary.to_csv('analysis.csv')
 
 - **[Quick Start Guide](QUICK_START_GUIDE.md)**: Common tasks and quick reference
 - **[Visualization & Analysis Guide](docs/VISUALIZATION_AND_ANALYSIS_GUIDE.md)**: Complete API documentation
+- **[Interactive Notebook](examples/quick_start.ipynb)**: Jupyter notebook tutorial
 - **[Examples](examples/)**: Working example scripts
+  - `quick_start.ipynb`: Interactive Jupyter notebook tutorial
   - `simple_generation.py`: Generate sample datasets
   - `visualize_datasets.py`: Visualization examples
   - `analyze_datasets.py`: Analysis examples
@@ -190,6 +195,7 @@ ts-stationary/
 │   └── utils/                      # Visualization & analysis tools
 │
 ├── examples/                       # Working examples
+│   ├── quick_start.ipynb           # Interactive Jupyter tutorial
 │   ├── simple_generation.py        # Generate sample data
 │   ├── visualize_datasets.py       # Visualization examples
 │   ├── analyze_datasets.py         # Analysis examples
