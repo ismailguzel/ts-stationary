@@ -122,9 +122,12 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Generated datasets
+# Generated datasets and outputs
 generated-dataset/
 example-output/
+simple_output/
+visualization_output/
+analysis_output/
 *.parquet
 
 # IDE
@@ -137,4 +140,7 @@ example-output/
 # OS
 .DS_Store
 Thumbs.db
+
+# Test files
+test_*.py
 

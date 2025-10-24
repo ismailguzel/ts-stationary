@@ -13,17 +13,25 @@ Main Components:
 - Seasonality generators: Single, Multiple, SARMA, SARIMA
 - Anomaly generators: Point, Collective, Contextual
 - Structural break generators: Mean, Variance, Trend shifts
+- Visualization utilities: Plot single/multiple series, distributions, ACF/PACF, dashboards
+- Analysis utilities: Statistical tests, trend/seasonality detection, changepoint analysis
 
 Example:
     >>> from timeseries_dataset_generator import TimeSeriesGenerator
     >>> from timeseries_dataset_generator.generators.stationary import generate_ar_dataset
+    >>> from timeseries_dataset_generator.utils import plot_single_series, analyze_dataset_summary
     >>> 
     >>> # Generate AR dataset
     >>> generate_ar_dataset(TimeSeriesGenerator, folder='output/ar', count=10)
+    >>> 
+    >>> # Load and visualize
+    >>> import pandas as pd
+    >>> df = pd.read_parquet('output/ar.parquet')
+    >>> plot_single_series(df, series_id=0, save_path='plot.png')
 """
 
 __version__ = "0.1.0"
-__author__ = "Your Name"
+__author__ = "TS-Stationary Project Team, TUBITAK 1001 Project No. 124F095"
 __license__ = "MIT"
 
 # Import core components
@@ -85,6 +93,30 @@ from .generators.structural_breaks import (
     generate_trend_shift_dataset
 )
 
+# Import utility functions (optional - users can also import from utils directly)
+from .utils import (
+    save_and_cleanup,
+    get_length_label,
+    plot_single_series,
+    plot_multiple_series,
+    plot_series_comparison,
+    plot_distribution,
+    plot_acf_pacf,
+    plot_rolling_statistics,
+    plot_category_overview,
+    create_dashboard,
+    compute_basic_statistics,
+    test_stationarity,
+    test_normality,
+    detect_seasonality,
+    detect_trend,
+    detect_changepoints,
+    compute_autocorrelation_stats,
+    compute_entropy,
+    analyze_dataset_summary,
+    compare_series
+)
+
 # Define what's available when using "from timeseries_dataset_generator import *"
 __all__ = [
     # Core
@@ -135,5 +167,31 @@ __all__ = [
     'generate_mean_shift_dataset',
     'generate_variance_shift_dataset',
     'generate_trend_shift_dataset',
+    
+    # Utilities - Helpers
+    'save_and_cleanup',
+    'get_length_label',
+    
+    # Utilities - Visualization
+    'plot_single_series',
+    'plot_multiple_series',
+    'plot_series_comparison',
+    'plot_distribution',
+    'plot_acf_pacf',
+    'plot_rolling_statistics',
+    'plot_category_overview',
+    'create_dashboard',
+    
+    # Utilities - Analysis
+    'compute_basic_statistics',
+    'test_stationarity',
+    'test_normality',
+    'detect_seasonality',
+    'detect_trend',
+    'detect_changepoints',
+    'compute_autocorrelation_stats',
+    'compute_entropy',
+    'analyze_dataset_summary',
+    'compare_series',
 ]
 

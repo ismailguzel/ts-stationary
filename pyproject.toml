@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "timeseries-dataset-generator"
 version = "0.1.0"
-description = "A comprehensive toolkit for generating synthetic time series datasets"
+description = "A comprehensive toolkit for generating, visualizing, and analyzing synthetic time series datasets"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+    {name = "TS-Stationary Project Team"}
 ]
 keywords = [
     "time-series",
@@ -20,7 +20,9 @@ keywords = [
     "garch",
     "anomaly-detection",
     "forecasting",
-    "machine-learning"
+    "machine-learning",
+    "visualization",
+    "statistical-analysis"
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -39,10 +41,12 @@ dependencies = [
     "numpy>=1.20.0",
     "pandas>=1.3.0",
     "matplotlib>=3.3.0",
+    "seaborn>=0.11.0",
+    "scipy>=1.7.0",
     "statsmodels>=0.13.0",
     "arch>=5.0.0",
-    "tqdm>=4.60.0",
     "pyarrow>=6.0.0",
+    "tqdm>=4.60.0",
 ]
 
 [project.optional-dependencies]
@@ -56,10 +60,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/timeseries-dataset-generator"
-Documentation = "https://timeseries-dataset-generator.readthedocs.io"
-Repository = "https://github.com/yourusername/timeseries-dataset-generator"
-"Bug Tracker" = "https://github.com/yourusername/timeseries-dataset-generator/issues"
+Homepage = "https://github.com/ismailguzel/ts-stationary"
+Repository = "https://github.com/ismailguzel/ts-stationary"
+"Bug Tracker" = "https://github.com/ismailguzel/ts-stationary/issues"
 
 [tool.black]
 line-length = 100

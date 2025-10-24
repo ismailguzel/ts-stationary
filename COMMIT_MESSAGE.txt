@@ -1,0 +1,26 @@
+feat: Add comprehensive visualization and analysis utilities
+
+Major update adding powerful tools for time series visualization and statistical analysis.
+
+New Features:
+- Add 8 visualization functions (plot_single_series, create_dashboard, plot_acf_pacf, etc.)
+- Add 10 statistical analysis functions (test_stationarity, detect_seasonality, detect_trend, etc.)
+- Add comprehensive example scripts for visualization and analysis
+- Add detailed API documentation guide
+
+Improvements:
+- Update package configuration (setup.py, pyproject.toml, requirements.txt)
+- Add NumPy 2.0 compatibility
+- Add seaborn and scipy dependencies
+- Update .gitignore for output directories
+- Clean up documentation structure
+
+Documentation:
+- Add VISUALIZATION_AND_ANALYSIS_GUIDE.md with complete API reference
+- Update README.md with new features
+- Add QUICK_START_GUIDE.md for common use cases
+
+Breaking Changes: None (fully backward compatible)
+
+Project: TUBITAK 1001 Project No. 124F095
+
