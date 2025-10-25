@@ -1,6 +1,6 @@
 # Quick Start Guide - Visualization & Analysis
 
-## 🚀 3 Steps to Get Started
+## 3 Steps to Get Started
 
 ### Step 1: Install Dependencies
 
@@ -24,7 +24,7 @@ python examples/visualize_datasets.py
 python examples/analyze_datasets.py
 ```
 
-## 📊 Common Tasks
+## Common Tasks
 
 ### Task 1: Create a Dashboard
 
@@ -94,7 +94,7 @@ print(f"Has trend: {result['has_trend']}")
 print(f"Direction: {result['trend_direction']}")
 ```
 
-## 📖 All Available Functions
+## All Available Functions
 
 ### Visualization (8 functions)
 - `plot_single_series()` - Single series plot
@@ -118,7 +118,7 @@ print(f"Direction: {result['trend_direction']}")
 - `analyze_dataset_summary()` - Batch analysis
 - `compare_series()` - Series comparison
 
-## 🎯 Import Patterns
+## Import Patterns
 
 ### Pattern 1: Import from utils
 
@@ -149,7 +149,7 @@ from timeseries_dataset_generator import (
 )
 ```
 
-## 🔥 Power User Tips
+## Power User Tips
 
 ### Tip 1: Batch Processing
 
@@ -206,7 +206,7 @@ plot_acf_pacf(df, series_id, save_path='03_acf_pacf.png')
 create_dashboard(df, series_id, save_path='04_dashboard.png')
 ```
 
-## 📚 Where to Learn More
+## Where to Learn More
 
 - **Quick Overview**: `../README.md`
 - **Detailed Guide**: `VISUALIZATION_AND_ANALYSIS_GUIDE.md`
@@ -214,7 +214,7 @@ create_dashboard(df, series_id, save_path='04_dashboard.png')
 - **Example Scripts**: `../examples/visualize_datasets.py` and `../examples/analyze_datasets.py`
 - **Interactive Tutorial**: `../examples/quick_start.ipynb`
 
-## ⚡ Troubleshooting
+## Troubleshooting
 
 ### Issue: Module not found
 **Solution**: `pip install -r requirements.txt`
@@ -228,16 +228,16 @@ create_dashboard(df, series_id, save_path='04_dashboard.png')
 ### Issue: Out of memory
 **Solution**: Process series individually instead of whole dataset
 
-## 🎓 Learning Path
+## Learning Path
 
-1. ✅ Run `simple_generation.py` to create sample data
-2. ✅ Run `visualize_datasets.py` to see visualization examples
-3. ✅ Run `analyze_datasets.py` to see analysis examples
-4. ✅ Try modifying the examples with your own parameters
-5. ✅ Read the detailed guide in `docs/` folder
-6. ✅ Build your own analysis pipeline
+1. Run `simple_generation.py` to create sample data
+2. Run `visualize_datasets.py` to see visualization examples
+3. Run `analyze_datasets.py` to see analysis examples
+4. Try modifying the examples with your own parameters
+5. Read the detailed guide in `docs/` folder
+6. Build your own analysis pipeline
 
-## 💡 Quick Reference
+## Quick Reference
 
 | Task | Function | Example |
 |------|----------|---------|
@@ -247,7 +247,7 @@ create_dashboard(df, series_id, save_path='04_dashboard.png')
 | Seasonality | `detect_seasonality()` | `detect_seasonality(df, 0)` |
 | Summary | `analyze_dataset_summary()` | `analyze_dataset_summary(df)` |
 
-## 🎉 You're Ready!
+## You're Ready!
 
 Start exploring your time series data with powerful visualization and analysis tools!
 
@@ -269,10 +269,10 @@ create_dashboard(df, series_id=0, save_path='dashboard.png')
 summary = analyze_dataset_summary(df)
 print(summary)
 
-# Done! 🚀
+# Done!
 ```
 
 ---
 
-**Happy Analyzing! 📊✨**
+**Happy Analyzing!**
 

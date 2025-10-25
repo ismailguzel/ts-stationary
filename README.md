@@ -18,9 +18,9 @@ This library provides a comprehensive toolkit for generating synthetic time seri
 - **PyPI-Ready**: Professional package structure
 - **Comprehensive Documentation**: Detailed guides and examples
 - **Production Ready**: Tested and validated
-- **📊 Visualization Tools**: Rich plotting functions for time series analysis
-- **📈 Analysis Utilities**: Statistical tests, trend detection, changepoint analysis
-- **🎯 Easy to Use**: Simple API for both generation and analysis
+- **Visualization Tools**: Rich plotting functions for time series analysis
+- **Analysis Utilities**: Statistical tests, trend detection, changepoint analysis
+- **Easy to Use**: Simple API for both generation and analysis
 
 ## Quick Start
 

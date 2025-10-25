@@ -40,15 +40,15 @@ CONFIG = {
 **Use Case:** Research focused on structural breaks without seasonality
 
 **Configuration:**
-- ✓ Stationary series (all lengths)
-- ✓ Deterministic trends (all lengths)
-- ✓ Point anomalies (all lengths, single & multiple)
-- ✓ Collective anomalies (only long series, multiple only)
-- ✗ Contextual anomalies (disabled)
-- ✓ Stochastic series (all lengths)
-- ✓ Volatility models (all lengths)
-- ✗ Seasonality (disabled)
-- ✓ Structural breaks (only long series, multiple only)
+- Stationary series (all lengths)
+- Deterministic trends (all lengths)
+- Point anomalies (all lengths, single & multiple)
+- Collective anomalies (only long series, multiple only)
+- Contextual anomalies (disabled)
+- Stochastic series (all lengths)
+- Volatility models (all lengths)
+- Seasonality (disabled)
+- Structural breaks (only long series, multiple only)
 
 **Already configured by default!** Just run the script.
 
