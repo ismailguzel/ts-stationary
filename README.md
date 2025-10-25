@@ -78,8 +78,8 @@ print(summary)
 ### Generate Full Dataset
 
 ```bash
-# Generate 225 parquet files (~2GB)
-python examples/dataset_updated.py
+# Generate comprehensive dataset with configurable scenarios
+python examples/dataset_generation.py
 ```
 
 ### Quick Examples
@@ -162,27 +162,28 @@ summary.to_csv('analysis.csv')
 ```
 
 **For detailed documentation**, see:
+- [Quick Start Guide](docs/QUICK_START_GUIDE.md) - Common use cases
 - [Visualization & Analysis Guide](docs/VISUALIZATION_AND_ANALYSIS_GUIDE.md) - Complete API reference
-- [Quick Start Guide](QUICK_START_GUIDE.md) - Common use cases
+- [Dataset Generation Guide](docs/DATASET_GENERATION_GUIDE.md) - Configurable dataset generation
 
 ## Documentation
 
-- **[Quick Start Guide](QUICK_START_GUIDE.md)**: Common tasks and quick reference
+- **[Quick Start Guide](docs/QUICK_START_GUIDE.md)**: Common tasks and quick reference
 - **[Visualization & Analysis Guide](docs/VISUALIZATION_AND_ANALYSIS_GUIDE.md)**: Complete API documentation
+- **[Dataset Generation Guide](docs/DATASET_GENERATION_GUIDE.md)**: Configurable dataset generation scenarios
 - **[Interactive Notebook](examples/quick_start.ipynb)**: Jupyter notebook tutorial
 - **[Examples](examples/)**: Working example scripts
   - `quick_start.ipynb`: Interactive Jupyter notebook tutorial
   - `simple_generation.py`: Generate sample datasets
   - `visualize_datasets.py`: Visualization examples
   - `analyze_datasets.py`: Analysis examples
-  - `dataset_updated.py`: Full dataset generation
+  - `dataset_generation.py`: Configurable full dataset generation
 
 ## Project Structure
 
 ```
 ts-stationary/
 ├── README.md                       # Main documentation
-├── QUICK_START_GUIDE.md            # Quick reference
 ├── LICENSE                         # MIT License
 ├── setup.py                        # Package setup
 ├── pyproject.toml                  # Modern packaging config
@@ -199,10 +200,12 @@ ts-stationary/
 │   ├── simple_generation.py        # Generate sample data
 │   ├── visualize_datasets.py       # Visualization examples
 │   ├── analyze_datasets.py         # Analysis examples
-│   └── dataset_updated.py          # Full dataset generation
+│   └── dataset_generation.py       # Configurable dataset generation
 │
-└── docs/                           # Additional documentation
-    └── VISUALIZATION_AND_ANALYSIS_GUIDE.md
+└── docs/                           # Documentation
+    ├── QUICK_START_GUIDE.md        # Quick reference guide
+    ├── DATASET_GENERATION_GUIDE.md # Dataset generation guide
+    └── VISUALIZATION_AND_ANALYSIS_GUIDE.md # API reference
 ```
 
 ## Dependencies

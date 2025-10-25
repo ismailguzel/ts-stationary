@@ -208,11 +208,11 @@ create_dashboard(df, series_id, save_path='04_dashboard.png')
 
 ## 📚 Where to Learn More
 
-- **Quick Overview**: `README.md`
-- **Detailed Guide**: `docs/VISUALIZATION_AND_ANALYSIS_GUIDE.md`
-- **Turkish Summary**: `DEGISIKLIKLER.md`
-- **Technical Details**: `IMPROVEMENTS_SUMMARY.md`
-- **Example Scripts**: `examples/visualize_datasets.py` and `examples/analyze_datasets.py`
+- **Quick Overview**: `../README.md`
+- **Detailed Guide**: `VISUALIZATION_AND_ANALYSIS_GUIDE.md`
+- **Dataset Generation Guide**: `DATASET_GENERATION_GUIDE.md`
+- **Example Scripts**: `../examples/visualize_datasets.py` and `../examples/analyze_datasets.py`
+- **Interactive Tutorial**: `../examples/quick_start.ipynb`
 
 ## ⚡ Troubleshooting
 

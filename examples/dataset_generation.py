@@ -1,16 +1,212 @@
 """
-Updated dataset generation script using the new modular library.
+Configurable Dataset Generation Script
+========================================
 
-This script demonstrates how to use the new timeseries_dataset_generator
-library to generate comprehensive time series datasets.
+This script generates time series datasets based on a flexible configuration system.
+
+USAGE:
+    1. Modify the CONFIG dictionary below to enable/disable dataset types
+    2. Run: python dataset_generation.py
+    3. Generated datasets will be saved in the 'generated-dataset' directory
+
+QUICK START SCENARIOS:
+    
+    Scenario 1: Research Focused (Current Default)
+    -----------------------------------------------
+    - No seasonality
+    - No contextual anomalies
+    - Only long series for multiple structural breaks
+    
+    Already configured below!
+    
+    
+    Scenario 2: Full Dataset Generation
+    ------------------------------------
+    To generate ALL dataset types, change these in CONFIG:
+    
+    'seasonality': {
+        'enabled': True,
+        'types': ['single', 'multiple', 'sarma', 'sarima'],
+        'length_ranges': ['short', 'medium']  # Exclude 'long' for sarma/sarima
+    }
+    
+    'contextual_anomalies': {
+        'enabled': True,
+        'single': {
+            'enabled': True,
+            'length_ranges': ['short', 'medium', 'long']
+        },
+        'multiple': {
+            'enabled': True,
+            'length_ranges': ['long']
+        }
+    }
+    
+    Add 'single' sections to structural breaks with all length ranges
+    
+    
+    Scenario 3: Only Stationary & Trends (Quick Test)
+    --------------------------------------------------
+    Set 'enabled': False for all categories except:
+    - 'stationary'
+    - 'deterministic_trends'
+    
+    
+    Scenario 4: Anomaly Detection Focus
+    ------------------------------------
+    Set 'enabled': True only for:
+    - 'stationary' (as base)
+    - 'point_anomalies'
+    - 'collective_anomalies'
+    - 'contextual_anomalies'
+    
+CONFIGURATION:
+    Modify the CONFIG dictionary below to control what gets generated.
 """
 
 from pathlib import Path
 import random
 import numpy as np
 
+# ============================================================================
+# CONFIGURATION - Modify these settings to control dataset generation
+# ============================================================================
+
+CONFIG = {
+    # Random seed for reproducibility
+    'random_seed': 42,
+    
+    # Output directory
+    'output_dir': 'generated-dataset',
+    
+    # Number of series to generate per configuration
+    'count': 10,
+    
+    # Dataset types to generate
+    'stationary': {
+        'enabled': True,
+        'length_ranges': ['short', 'medium', 'long']  # Options: 'short', 'medium', 'long'
+    },
+    
+    'deterministic_trends': {
+        'enabled': True,
+        'length_ranges': ['short', 'medium', 'long']
+    },
+    
+    'point_anomalies': {
+        'enabled': True,
+        'single': {
+            'enabled': True,
+            'length_ranges': ['short', 'medium', 'long']
+        },
+        'multiple': {
+            'enabled': True,
+            'length_ranges': ['short', 'medium', 'long']
+        }
+    },
+    
+    'collective_anomalies': {
+        'enabled': True,
+        'multiple': {  # Only multiple collective anomalies (research focused)
+            'enabled': True,
+            'length_ranges': ['long']  # Only long series for multiple cases
+        }
+    },
+    
+    'contextual_anomalies': {
+        'enabled': False,  # Disabled for research focused scenario
+        'single': {
+            'enabled': False,
+            'length_ranges': []
+        },
+        'multiple': {
+            'enabled': False,
+            'length_ranges': []
+        }
+    },
+    
+    'stochastic': {
+        'enabled': True,
+        'length_ranges': ['short', 'medium', 'long']
+    },
+    
+    'volatility': {
+        'enabled': True,
+        'length_ranges': ['short', 'medium', 'long']
+    },
+    
+    'seasonality': {
+        'enabled': False,  # Disabled for research focused scenario
+        'types': [],  # Options: 'single', 'multiple', 'sarma', 'sarima'
+        'length_ranges': []
+    },
+    
+    'structural_breaks': {
+        'mean_shift': {
+            'enabled': True,
+            'multiple': {  # Only multiple cases (research focused)
+                'enabled': True,
+                'length_ranges': ['long']  # Only long series
+            }
+        },
+        'variance_shift': {
+            'enabled': True,
+            'multiple': {  # Only multiple cases (research focused)
+                'enabled': True,
+                'length_ranges': ['long']  # Only long series
+            }
+        },
+        'trend_shift': {
+            'enabled': True,
+            'multiple': {  # Only multiple cases (research focused)
+                'enabled': True,
+                'length_ranges': ['long']  # Only long series
+            }
+        }
+    }
+}
+
+# ============================================================================
+# Helper functions
+# ============================================================================
+
+def get_length_range(length_key):
+    """Convert length key to actual range tuple."""
+    ranges = {
+        'short': (50, 100),
+        'medium': (300, 500),
+        'long': (1000, 10000)
+    }
+    return ranges.get(length_key, (50, 100))
+
+def is_enabled(*path):
+    """Check if a configuration path is enabled."""
+    config = CONFIG
+    for key in path:
+        if key not in config:
+            return False
+        config = config[key]
+        if not isinstance(config, dict):
+            return False
+    return config.get('enabled', False)
+
+def get_length_ranges(*path):
+    """Get enabled length ranges for a configuration path."""
+    config = CONFIG
+    for key in path:
+        if key not in config:
+            return []
+        config = config[key]
+    
+    ranges = config.get('length_ranges', [])
+    return [(key, get_length_range(key)) for key in ranges]
+
+# ============================================================================
+# Setup
+# ============================================================================
+
 # Set random seeds for reproducibility
-RANDOM_SEED = 42
+RANDOM_SEED = CONFIG['random_seed']
 random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
@@ -54,6 +250,9 @@ from timeseries_dataset_generator.generators import (
     generate_trend_shift_dataset,
 )
 
+# ============================================================================
+# Path and constant setup
+# ============================================================================
 
 def ensure_base_dir(base_dir: Path) -> Path:
     """Create base directory if it doesn't exist."""
@@ -61,7 +260,7 @@ def ensure_base_dir(base_dir: Path) -> Path:
     return base_dir
 
 
-BASE_OUTPUT_DIR = ensure_base_dir(Path("generated-dataset"))
+BASE_OUTPUT_DIR = ensure_base_dir(Path(CONFIG['output_dir']))
 
 
 def folder_path(*parts: str) -> str:
@@ -70,569 +269,354 @@ def folder_path(*parts: str) -> str:
     return str(path)
 
 
+# Constants
 bases = ["ar", "ma", "arma", "white_noise"]
-length_ranges = [(50, 100), (300, 500), (1000, 10000)]
 signs = [1, -1]
-locations = ["beginning", "middle", "end"] 
+locations = ["beginning", "middle", "end"]
+change_types = ['direction_change', 'magnitude_change', 'direction_and_magnitude_change']
+
+# ============================================================================
+# Dataset Generation Functions
+# ============================================================================
+
+print("="*70)
+print("DATASET GENERATION STARTING")
+print("="*70)
+print(f"Configuration: Research Focused Scenario")
+print(f"  - Seasonality: {'✓' if is_enabled('seasonality') else '✗ (disabled)'}")
+print(f"  - Contextual Anomalies: {'✓' if is_enabled('contextual_anomalies') else '✗ (disabled)'}")
+print(f"  - Multiple Structural Breaks: Only long series")
+print("="*70)
+print() 
 
 #### STATIONARY SERIES
 
-for base in bases:
-    for length_range in length_ranges:
-        
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-        
-        if base == "ar":
-            generate_ar_dataset(
-                TimeSeriesGenerator,  # YENİ: TimeSeriesGenerator ekledik
-                folder=folder_path("stationary", base, l), 
-                count=10, 
+if is_enabled('stationary'):
+    print("✓ Generating: Stationary series")
+    length_ranges_list = get_length_ranges('stationary')
+    
+    generators = {
+        "ar": generate_ar_dataset,
+        "ma": generate_ma_dataset,
+        "arma": generate_arma_dataset,
+        "white_noise": generate_wn_dataset
+    }
+    
+    for base in bases:
+        for length_label, length_range in length_ranges_list:
+            generators[base](
+                TimeSeriesGenerator,
+                folder=folder_path("stationary", base, length_label), 
+                count=CONFIG['count'], 
                 length_range=length_range
             )
-        elif base == "ma":
-            generate_ma_dataset(
+    print()
+else:
+    print("⊗ Skipping: Stationary series (disabled)\n")
+
+
+
+
+#### DETERMINISTIC TRENDS
+
+if is_enabled('deterministic_trends'):
+    print("✓ Generating: Deterministic trends")
+    length_ranges_list = get_length_ranges('deterministic_trends')
+    
+    trend_generators = {
+        'linear': generate_linear_trend_dataset,
+        'quadratic': generate_quadratic_trend_dataset,
+        'cubic': generate_cubic_trend_dataset,
+        'exponential': generate_exponential_trend_dataset,
+        'damped': generate_damped_trend_dataset
+    }
+    
+    for trend_type, generator_func in trend_generators.items():
+        for base in bases:
+            for length_label, length_range in length_ranges_list:
+                for sign in signs:
+                    direction = "up" if sign == 1 else "down"
+                    generator_func(
+                        TimeSeriesGenerator,
+                        folder=folder_path(f"deterministic_trend_{trend_type}", direction, base, length_label),
+                        kind=base,
+                        count=CONFIG['count'],
+                        length_range=length_range,
+                        sign=sign
+                    )
+    print()
+else:
+    print("⊗ Skipping: Deterministic trends (disabled)\n")
+
+
+
+#### POINT ANOMALIES
+
+if is_enabled('point_anomalies'):
+    print("✓ Generating: Point anomalies")
+    
+    # Single point anomalies
+    if is_enabled('point_anomalies', 'single'):
+        length_ranges_list = get_length_ranges('point_anomalies', 'single')
+        for base in bases:
+            for length_label, length_range in length_ranges_list:
+                for loc in locations:
+                    generate_point_anomaly_dataset(
+                        TimeSeriesGenerator,
+                        folder=folder_path("point_anomaly_single", base, length_label),
+                        kind=base,
+                        count=CONFIG['count'],
+                        length_range=length_range,
+                        anomaly_type='single',
+                        location=loc
+                    )
+    
+    # Multiple point anomalies
+    if is_enabled('point_anomalies', 'multiple'):
+        length_ranges_list = get_length_ranges('point_anomalies', 'multiple')
+        for base in bases:
+            for length_label, length_range in length_ranges_list:
+                generate_point_anomaly_dataset(
+                    TimeSeriesGenerator,
+                    folder=folder_path("point_anomaly_multiple", base, length_label),
+                    kind=base,
+                    count=CONFIG['count'],
+                    length_range=length_range,
+                    anomaly_type='multiple'
+                )
+    print()
+else:
+    print("⊗ Skipping: Point anomalies (disabled)\n")
+
+
+#### COLLECTIVE ANOMALIES
+
+if is_enabled('collective_anomalies'):
+    print("✓ Generating: Collective anomalies")
+    
+    # Multiple collective anomalies
+    if is_enabled('collective_anomalies', 'multiple'):
+        length_ranges_list = get_length_ranges('collective_anomalies', 'multiple')
+        for base in bases:
+            for length_label, length_range in length_ranges_list:
+                n = random.randint(2, 4)
+                generate_collective_anomaly_dataset(
+                    TimeSeriesGenerator,
+                    folder=folder_path("multi_collective_anomaly", base, length_label),
+                    kind=base,
+                    count=CONFIG['count'],
+                    num_anomalies=n,
+                    anomaly_type='multiple',
+                    length_range=length_range,
+                )
+    print()
+else:
+    print("⊗ Skipping: Collective anomalies (disabled)\n")
+
+
+#### CONTEXTUAL ANOMALIES
+
+if is_enabled('contextual_anomalies'):
+    print("✓ Generating: Contextual anomalies")
+    
+    # Single contextual anomalies
+    if is_enabled('contextual_anomalies', 'single'):
+        length_ranges_list = get_length_ranges('contextual_anomalies', 'single')
+        for length_label, length_range in length_ranges_list:
+            for loc in locations:
+                generate_contextual_anomaly_dataset(
+                    TimeSeriesGenerator,
+                    folder=folder_path("contextual_anomaly", length_label),
+                    count=CONFIG['count'],
+                    length_range=length_range,
+                    location=loc
+                )
+    
+    # Multiple contextual anomalies
+    if is_enabled('contextual_anomalies', 'multiple'):
+        length_ranges_list = get_length_ranges('contextual_anomalies', 'multiple')
+        for length_label, length_range in length_ranges_list:
+            n = random.randint(2, 4)
+            generate_contextual_anomaly_dataset(
                 TimeSeriesGenerator,
-                folder=folder_path("stationary", base, l), 
-                count=10, 
-                length_range=length_range
-            )
-        elif base == "arma":
-            generate_arma_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("stationary", base, l), 
-                count=10, 
-                length_range=length_range
-            )
-        elif base == "white_noise":
-            generate_wn_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("stationary", base, l), 
-                count=10, 
-                length_range=length_range
-            )
-
-
-
-
-######linear trend
-for base in bases:
-    for length_range in length_ranges:
-        for sign in signs:
-            d = "up" if sign == 1 else "down"
-            if length_range == (50,100):
-              l = "short"
-            elif length_range == (300,500):
-              l = "medium"
-            else:
-              l = "long"
-
-            generate_linear_trend_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("deterministic_trend_linear", d, base, l),
-                kind=base,
-                count=10,
+                folder=folder_path("multi_contextual_anomaly", length_label),
+                count=CONFIG['count'],
+                num_anomalies=n,
+                anomaly_type='multiple',
                 length_range=length_range,
-                sign=sign
             )
+    print()
+else:
+    print("⊗ Skipping: Contextual anomalies (disabled)\n")
 
-######quadratic trend
-for base in bases:
-    for length_range in length_ranges:
-        for sign in signs:
-            d = "up" if sign == 1 else "down"
-            if length_range == (50,100):
-              l = "short"
-            elif length_range == (300,500):
-              l = "medium"
-            else:
-              l = "long"
 
-            generate_quadratic_trend_dataset(
+
+
+
+
+#### STOCHASTIC SERIES
+
+if is_enabled('stochastic'):
+    print("✓ Generating: Stochastic series")
+    length_ranges_list = get_length_ranges('stochastic')
+    
+    stochastic_bases = ["random_walk", "random_walk_drift", "ari", "ima", "arima"]
+    stochastic_generators = {
+        "random_walk": generate_random_walk_dataset,
+        "random_walk_drift": generate_random_walk_with_drift_dataset,
+        "ari": generate_ari_dataset,
+        "ima": generate_ima_dataset,
+        "arima": generate_arima_dataset
+    }
+    
+    for base in stochastic_bases:
+        for length_label, length_range in length_ranges_list:
+            stochastic_generators[base](
                 TimeSeriesGenerator,
-                folder=folder_path("deterministic_trend_quadratic", base, l),
-                kind=base,
-                count=10,
-                length_range=length_range,
-                sign=sign
-            )
-
-
-#######cubic trend
-for base in bases:
-    for length_range in length_ranges:
-        for sign in signs:
-            d = "up" if sign == 1 else "down"
-            if length_range == (50,100):
-              l = "short"
-            elif length_range == (300,500):
-              l = "medium"
-            else:
-              l = "long"
-
-            generate_cubic_trend_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("deterministic_trend_cubic", base, l),
-                kind=base,
-                count=10,
-                length_range=length_range,
-                sign=sign
-            )
-
-
-
-
-########exponential trend
-for base in bases:
-    for length_range in length_ranges:
-        for sign in signs:
-            d = "up" if sign == 1 else "down"
-            if length_range == (50,100):
-              l = "short"
-            elif length_range == (300,500):
-              l = "medium"
-            else:
-              l = "long"
-
-            generate_exponential_trend_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("deterministic_trend_exponential", base, l),
-                kind=base,
-                count=10,
-                length_range=length_range,
-                sign=sign
-            )
-
-
-
-
-#######damped trend
-for base in bases:
-    for length_range in length_ranges:
-        for sign in signs:
-            d = "up" if sign == 1 else "down"
-            if length_range == (50,100):
-              l = "short"
-            elif length_range == (300,500):
-              l = "medium"
-            else:
-              l = "long"
-
-            generate_damped_trend_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("deterministic_trend_damped", base, l),
-                kind=base,
-                count=10,
-                length_range=length_range,
-                sign=sign
-            )
-
-
-
-#######point anomaly
-#single point anomalies
-for base in bases:
-    for length_range in length_ranges:
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-        for loc in locations:
-            generate_point_anomaly_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("point_anomaly_single", base, l),
-                kind=base,
-                count=10,
-                length_range=length_range,
-                anomaly_type='single',
-                location=loc
-            )
-
-#multi point anomalies
-for base in bases:
-    for length_range in length_ranges:
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-        generate_point_anomaly_dataset(
-            TimeSeriesGenerator,
-            folder=folder_path("point_anomaly_multiple", base, l),
-            kind=base,
-            count=10,
-            length_range=length_range,
-            anomaly_type='multiple'
-        )
-
-
-
-
-######collective anomaly
-for base in bases:
-    for length_range in length_ranges:
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-        for loc in locations:
-            generate_collective_anomaly_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("collective_anomaly", base, l),
-                kind=base,
-                count=10,
-                length_range=length_range,
-                location=loc
-            )
-
-
-for base in bases:
-    for length_range in [(1000, 10000)]:
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-        n = random.randint(2,4)
-        generate_collective_anomaly_dataset(
-            TimeSeriesGenerator,
-            folder=folder_path("multi_collective_anomaly", base, l),
-            kind=base,
-            count=10,
-            num_anomalies=n,
-            anomaly_type='multiple',
-            length_range=length_range,
-        )
-
-
-
-#####contextual anomaly
-for length_range in length_ranges:
-    if length_range == (50,100):
-        l = "short"
-    elif length_range == (300,500):
-        l = "medium"
-    else:
-        l = "long"
-    for loc in locations:
-        generate_contextual_anomaly_dataset(
-            TimeSeriesGenerator,
-            folder=folder_path("contextual_anomaly", l),
-            count=10,
-            length_range=length_range,
-            location=loc
-        )
-
-
-for length_range in [(1000, 10000)]:
-    if length_range == (50,100):
-        l = "short"
-    elif length_range == (300,500):
-        l = "medium"
-    else:
-        l = "long"
-    n = random.randint(2,4)
-    generate_contextual_anomaly_dataset(
-        TimeSeriesGenerator,
-        folder=folder_path("multi_contextual_anomaly", l),
-        count=10,
-        num_anomalies=n,
-        anomaly_type='multiple',
-        length_range=length_range,
-    )
-
-
-
-#### STOCHASTIC SERIES ####
-
-stochastic_bases = ["random_walk", "random_walk_drift", "ari", "ima", "arima"]
-
-for base in stochastic_bases:
-    for length_range in length_ranges:
-
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-
-        if base == "random_walk":
-            generate_random_walk_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("stochastic", base, l), 
-                count=10, 
+                folder=folder_path("stochastic", base, length_label), 
+                count=CONFIG['count'], 
                 length_range=length_range
             )
-        elif base == "random_walk_drift":
-            generate_random_walk_with_drift_dataset(
+    print()
+else:
+    print("⊗ Skipping: Stochastic series (disabled)\n")
+
+
+#### VOLATILITY SERIES
+
+if is_enabled('volatility'):
+    print("✓ Generating: Volatility series")
+    length_ranges_list = get_length_ranges('volatility')
+    
+    volatility_bases = ["arch", "garch", "egarch", "aparch"]
+    volatility_generators = {
+        "arch": generate_arch_dataset,
+        "garch": generate_garch_dataset,
+        "egarch": generate_egarch_dataset,
+        "aparch": generate_aparch_dataset
+    }
+    
+    for base in volatility_bases:
+        for length_label, length_range in length_ranges_list:
+            volatility_generators[base](
                 TimeSeriesGenerator,
-                folder=folder_path("stochastic", base, l), 
-                count=10, 
+                folder=folder_path("volatility", base, length_label), 
+                count=CONFIG['count'], 
                 length_range=length_range
             )
-        elif base == "ari":
-            generate_ari_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("stochastic", base, l), 
-                count=10, 
-                length_range=length_range
-            )
-        elif base == "ima":
-            generate_ima_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("stochastic", base, l), 
-                count=10, 
-                length_range=length_range
-            )
-        elif base == "arima":
-            generate_arima_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("stochastic", base, l), 
-                count=10, 
-                length_range=length_range
-            )
-
-#### VOLATILITY SERIES ####
-
-volatility_bases = ["arch", "garch", "egarch", "aparch"]
-
-for base in volatility_bases:
-    for length_range in length_ranges:
-
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-
-        if base == "arch":
-            generate_arch_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("volatility", base, l), 
-                count=10, 
-                length_range=length_range
-            )
-        elif base == "garch":
-            generate_garch_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("volatility", base, l), 
-                count=10, 
-                length_range=length_range
-            )
-        elif base == "egarch":
-            generate_egarch_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("volatility", base, l), 
-                count=10, 
-                length_range=length_range
-            )
-        elif base == "aparch":
-            generate_aparch_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("volatility", base, l), 
-                count=10, 
-                length_range=length_range
-            )
+    print()
+else:
+    print("⊗ Skipping: Volatility series (disabled)\n")
 
 
+#### SEASONALITY
 
-###### seasonality ######
-
-seasonality_types = ['single', 'multiple', 'sarma', 'sarima']
-
-for seasonality in seasonality_types:
-    for length_range in length_ranges:
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-
-        if seasonality == 'single':
-            generate_single_seasonality_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("single_seasonality", l), 
-                count = 10, 
-                length_range=length_range
-            )
-        if seasonality == 'multiple':
-            generate_multiple_seasonality_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("multiple_seasonality", l), 
-                count = 10, 
-                length_range=length_range
-            )
-        if seasonality == 'sarma':
-            if l == 'long':
-                pass
-            else:
+if is_enabled('seasonality'):
+    print("✓ Generating: Seasonality")
+    length_ranges_list = get_length_ranges('seasonality')
+    seasonality_types_to_gen = CONFIG['seasonality'].get('types', [])
+    
+    for seasonality_type in seasonality_types_to_gen:
+        for length_label, length_range in length_ranges_list:
+            if seasonality_type == "single":
+                generate_single_seasonality_dataset(
+                    TimeSeriesGenerator,
+                    folder=folder_path("single_seasonality", length_label),
+                    count=CONFIG['count'],
+                    length_range=length_range
+                )
+            elif seasonality_type == "multiple":
+                generate_multiple_seasonality_dataset(
+                    TimeSeriesGenerator,
+                    folder=folder_path("multiple_seasonality", length_label),
+                    count=CONFIG['count'],
+                    length_range=length_range
+                )
+            elif seasonality_type == "sarma":
                 generate_sarma_dataset(
                     TimeSeriesGenerator,
-                    folder=folder_path("sarma_seasonality", l), 
-                    count = 10, 
+                    folder=folder_path("sarma_seasonality", length_label),
+                    count=CONFIG['count'],
                     length_range=length_range
                 )
-        if seasonality == 'sarima':
-            if l == 'long':
-                pass
-            else:
+            elif seasonality_type == "sarima":
                 generate_sarima_dataset(
                     TimeSeriesGenerator,
-                    folder=folder_path("sarima_seasonality", l), 
-                    count = 10, 
+                    folder=folder_path("sarima_seasonality", length_label),
+                    count=CONFIG['count'],
+                    length_range=length_range
+                )
+    print()
+else:
+    print("⊗ Skipping: Seasonality (disabled)\n")
+
+
+
+#### STRUCTURAL BREAKS
+
+print("✓ Generating: Structural breaks")
+
+# Mean Shift
+if is_enabled('structural_breaks', 'mean_shift'):
+    print("  - Mean shift")
+    if is_enabled('structural_breaks', 'mean_shift', 'multiple'):
+        length_ranges_list = get_length_ranges('structural_breaks', 'mean_shift', 'multiple')
+        for base in bases:
+            for length_label, length_range in length_ranges_list:
+                n = random.randint(2, 4)
+                generate_mean_shift_dataset(
+                    TimeSeriesGenerator,
+                    folder=folder_path("multi_mean_shift", base, length_label),
+                    kind=base,
+                    count=CONFIG['count'],
+                    num_breaks=n,
+                    break_type='multiple',
                     length_range=length_range
                 )
 
-
-
-###### structural breaks ######
-
-### mean shift ###
-
-for base in bases:
-    for length_range in length_ranges:
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-        for loc in locations:
-            for sign in signs:
-                generate_mean_shift_dataset(
-                    TimeSeriesGenerator,
-                    folder=folder_path("mean_shift", base, l),
-                    kind=base,
-                    count=10,
-                    signs = [sign],
-                    length_range=length_range,
-                    location=loc,
-                    break_type = 'single',
-                    num_breaks = 1)
-
-
-for base in bases:
-    for length_range in [(300,500), (1000, 10000)]:
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-        n = random.randint(2,4)
-        generate_mean_shift_dataset(
-            TimeSeriesGenerator,
-            folder=folder_path("multi_mean_shift", base, l),
-            kind=base,
-            count=10,
-            num_breaks=n,
-            break_type='multiple',
-            length_range=length_range)
-        
-
-### variance shift ###
-
-for base in bases:
-    for length_range in length_ranges:
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-        for loc in locations:
-            for sign in signs:
+# Variance Shift
+if is_enabled('structural_breaks', 'variance_shift'):
+    print("  - Variance shift")
+    if is_enabled('structural_breaks', 'variance_shift', 'multiple'):
+        length_ranges_list = get_length_ranges('structural_breaks', 'variance_shift', 'multiple')
+        for base in bases:
+            for length_label, length_range in length_ranges_list:
+                n = random.randint(2, 4)
                 generate_variance_shift_dataset(
                     TimeSeriesGenerator,
-                    folder=folder_path("variance_shift", base, l),
+                    folder=folder_path("multi_variance_shift", base, length_label),
                     kind=base,
-                    count=10,
-                    signs = [sign],
-                    length_range=length_range,
-                    location=loc,
-                    break_type = 'single',
-                    num_breaks = 1)
+                    count=CONFIG['count'],
+                    num_breaks=n,
+                    break_type='multiple',
+                    length_range=length_range
+                )
 
-
-for base in bases:
-    for length_range in [(300,500), (1000, 10000)]:
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-        n = random.randint(2,4)
-        generate_variance_shift_dataset(
-            TimeSeriesGenerator,
-            folder=folder_path("multi_variance_shift", base, l),
-            kind=base,
-            count=10,
-            num_breaks=n,
-            break_type='multiple',
-            length_range=length_range)
-
-
-### trend shift ###
-
-change_types = ['direction_change', 'magnitude_change', 'direction_and_magnitude_change'] 
-
-for base in bases:
-    for length_range in length_ranges:
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-        for loc in locations:
-            for sign in signs:
-                for change_type in change_types:
+# Trend Shift
+if is_enabled('structural_breaks', 'trend_shift'):
+    print("  - Trend shift")
+    if is_enabled('structural_breaks', 'trend_shift', 'multiple'):
+        length_ranges_list = get_length_ranges('structural_breaks', 'trend_shift', 'multiple')
+        for base in bases:
+            for length_label, length_range in length_ranges_list:
+                for sign in signs:
+                    n = random.randint(2, 4)
+                    change_type_samples = random.choices(change_types, k=n)
                     generate_trend_shift_dataset(
                         TimeSeriesGenerator,
-                        folder=folder_path("trend_shift", base, l),
+                        folder=folder_path("multi_trend_shift", base, length_label),
                         kind=base,
-                        count=10,
-                        sign = sign,
-                        change_types = [change_type],
-                        length_range=length_range,
-                        location=loc,
-                        break_type = 'single',
-                        num_breaks = 1)
+                        count=CONFIG['count'],
+                        num_breaks=n,
+                        change_types=change_type_samples,
+                        sign=sign,
+                        break_type='multiple',
+                        length_range=length_range
+                    )
 
-
-for base in bases:
-    for length_range in [(300,500), (1000, 10000)]:
-        if length_range == (50,100):
-            l = "short"
-        elif length_range == (300,500):
-            l = "medium"
-        else:
-            l = "long"
-        for sign in signs:
-            n = random.randint(2,4)
-            change_type_samples = random.choices(change_types, k=n)
-            generate_trend_shift_dataset(
-                TimeSeriesGenerator,
-                folder=folder_path("multi_trend_shift", base, l),
-                kind=base,
-                count=10,
-                num_breaks=n,
-                change_types = change_type_samples, 
-                sign = sign,
-                break_type='multiple',
-                length_range=length_range)
+print()
+print("="*70)
+print("DATASET GENERATION COMPLETE!")
+print(f"Output directory: {BASE_OUTPUT_DIR.absolute()}")
+print("="*70)
 
