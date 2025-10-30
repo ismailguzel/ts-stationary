@@ -470,7 +470,7 @@ class TimeSeriesGenerator:
 
     def generate_stationary_base_series(self, distribution=None):
         if distribution is None:
-            distribution = np.random.choice(self.base_distributions)
+            distribution = np.random.choice(self.stationary_base_distributions)
         if distribution == 'white_noise':
             series, info = self.generate_white_noise(self.length)
         elif distribution == 'ar':
@@ -481,28 +481,10 @@ class TimeSeriesGenerator:
             series, info = self.generate_arma_series(self.length)
 
         df = pd.DataFrame({
-            'time': np.arange(self.length), # <--- YENİ EKLENDİ
+            'time': np.arange(self.length),
             'data': series,
-            'stationary': (np.ones(self.length)).astype(int),
-            'det_lin_up': (np.zeros(self.length)).astype(int),
-            'det_lin_down': (np.zeros(self.length)).astype(int),
-            'det_quad': (np.zeros(self.length)).astype(int),
-            'det_cubic': (np.zeros(self.length)).astype(int),
-            'det_exp': (np.zeros(self.length)).astype(int),
-            'det_damped': (np.zeros(self.length)).astype(int),
-            'stoc_trend': (np.zeros(self.length)).astype(int),
-            'volatility': (np.zeros(self.length)).astype(int),
-            'single_seas': (np.zeros(self.length)).astype(int),
-            'multiple_seas': (np.zeros(self.length)).astype(int),
-            'seasonal_base': (np.zeros(self.length)).astype(int),
-            'point_anom_single': (np.zeros(self.length)).astype(int),
-            'point_anom_multi' : (np.zeros(self.length)).astype(int),
-            'collect_anom': (np.zeros(self.length)).astype(int),
-            'context_anom': (np.zeros(self.length)).astype(int),
-            'volatility': (np.zeros(self.length)).astype(int),
-            'mean_shift': (np.zeros(self.length)).astype(int),
-            'var_shift': (np.zeros(self.length)).astype(int),
-            'trend_shift': (np.zeros(self.length)).astype(int),})
+            'stationary': (np.ones(self.length)).astype(int)
+        })
         return df, info
 
     #ANOMALIES    
@@ -936,28 +918,10 @@ class TimeSeriesGenerator:
             raise ValueError("Invalid kind. Choose from 'rw', 'rwd', 'ari', 'ima', or 'arima'.")
 
         df = pd.DataFrame({
-            'time': np.arange(self.length), # <--- YENİ EKLENDİ
+            'time': np.arange(self.length),
             'data': series,
-            'stationary': (np.zeros(self.length)).astype(int),
-            'det_lin_up': (np.zeros(self.length)).astype(int),
-            'det_lin_down': (np.zeros(self.length)).astype(int),
-            'det_quad': (np.zeros(self.length)).astype(int),
-            'det_cubic': (np.zeros(self.length)).astype(int),
-            'det_exp': (np.zeros(self.length)).astype(int),
-            'det_damped': (np.zeros(self.length)).astype(int),
-            'stoc_trend': (np.ones(self.length)).astype(int),
-            'volatility': (np.zeros(self.length)).astype(int),
-            'single_seas': (np.zeros(self.length)).astype(int),
-            'multiple_seas': (np.zeros(self.length)).astype(int),
-            'seasonal_base': (np.zeros(self.length)).astype(int),
-            'point_anom_single': (np.zeros(self.length)).astype(int),
-            'point_anom_multi' : (np.zeros(self.length)).astype(int),
-            'collect_anom': (np.zeros(self.length)).astype(int),
-            'context_anom': (np.zeros(self.length)).astype(int),
-            'volatility': (np.zeros(self.length)).astype(int),
-            'mean_shift': (np.zeros(self.length)).astype(int),
-            'var_shift': (np.zeros(self.length)).astype(int),
-            'trend_shift': (np.zeros(self.length)).astype(int),})
+            'stationary': (np.zeros(self.length)).astype(int)
+        })
         return df, info
 
     #SEASONALITY
@@ -1015,28 +979,10 @@ class TimeSeriesGenerator:
 
     def generate_seasonality_from_base_series(self, kind = None, num_components = 2):
         df = pd.DataFrame({
-            'time': np.arange(self.length), # <--- YENİ EKLENDİ
+            'time': np.arange(self.length),
             'data': np.ones(self.length),
-            'stationary': (np.zeros(self.length)).astype(int),
-            'det_lin_up': (np.zeros(self.length)).astype(int),
-            'det_lin_down': (np.zeros(self.length)).astype(int),
-            'det_quad': (np.zeros(self.length)).astype(int),
-            'det_cubic': (np.zeros(self.length)).astype(int),
-            'det_exp': (np.zeros(self.length)).astype(int),
-            'det_damped': (np.zeros(self.length)).astype(int),
-            'stoc_trend': (np.zeros(self.length)).astype(int),
-            'volatility': (np.zeros(self.length)).astype(int),
-            'single_seas': (np.zeros(self.length)).astype(int),
-            'multiple_seas': (np.zeros(self.length)).astype(int),
-            'seasonal_base': (np.zeros(self.length)).astype(int),
-            'point_anom_single': (np.zeros(self.length)).astype(int),
-            'point_anom_multi' : (np.zeros(self.length)).astype(int),
-            'collect_anom': (np.zeros(self.length)).astype(int),
-            'context_anom': (np.zeros(self.length)).astype(int),
-            'volatility': (np.zeros(self.length)).astype(int),
-            'mean_shift': (np.zeros(self.length)).astype(int),
-            'var_shift': (np.zeros(self.length)).astype(int),
-            'trend_shift': (np.zeros(self.length)).astype(int),})
+            'stationary': (np.zeros(self.length)).astype(int)
+        })
 
         if kind == 'single':
             df, info = self.generate_single_seasonality(df)
@@ -1074,28 +1020,10 @@ class TimeSeriesGenerator:
             series = self.z_normalize(series)
 
         df = pd.DataFrame({
-            'time': np.arange(self.length), # <--- YENİ EKLENDİ
+            'time': np.arange(self.length),
             'data': series,
-            'stationary': (np.zeros(self.length)).astype(int),
-            'det_lin_up': (np.zeros(self.length)).astype(int),
-            'det_lin_down': (np.zeros(self.length)).astype(int),
-            'det_quad': (np.zeros(self.length)).astype(int),
-            'det_cubic': (np.zeros(self.length)).astype(int),
-            'det_exp': (np.zeros(self.length)).astype(int),
-            'det_damped': (np.zeros(self.length)).astype(int),
-            'stoc_trend': (np.zeros(self.length)).astype(int),
-            'volatility': (np.zeros(self.length)).astype(int),
-            'single_seas': (np.zeros(self.length)).astype(int),
-            'multiple_seas': (np.zeros(self.length)).astype(int),
-            'seasonal_base': (np.zeros(self.length)).astype(int),
-            'point_anom_single': (np.zeros(self.length)).astype(int),
-            'point_anom_multi' : (np.zeros(self.length)).astype(int),
-            'collect_anom': (np.zeros(self.length)).astype(int),
-            'context_anom': (np.zeros(self.length)).astype(int),
-            'volatility': (np.ones(self.length)).astype(int),
-            'mean_shift': (np.zeros(self.length)).astype(int),
-            'var_shift': (np.zeros(self.length)).astype(int),
-            'trend_shift': (np.zeros(self.length)).astype(int),})
+            'stationary': (np.zeros(self.length)).astype(int)
+        })
         return df, info
 
 

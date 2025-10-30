@@ -62,27 +62,6 @@ def generate_point_anomaly_dataset(
 ):
     """
     Generate point anomaly dataset.
-
-    Parameters
-    ----------
-    ts_generator_class : class
-        TimeSeriesGenerator class
-    folder : str
-        Output folder path
-    kind : str, default='ar'
-        Base series type ('ar', 'ma', 'arma', 'white_noise')
-    count : int, default=5
-        Number of series to generate
-    length_range : tuple, default=(300, 500)
-        (min, max) length for generated series
-    anomaly_type : str, default='single'
-        'single' or 'multiple'
-    location : str, default='middle'
-        Location of anomaly ('beginning', 'middle', 'end')
-
-    Returns
-    -------
-    None
     """
     os.makedirs(folder, exist_ok=True)
     all_dfs = []
@@ -99,18 +78,17 @@ def generate_point_anomaly_dataset(
             loc = location if location else np.random.choice(['beginning', 'middle', 'end'])
             df, info_anom = ts.generate_point_anomaly(df, location=loc)
             label = f"{kind}_single_point_anomaly_{loc}_{l}"
-            point_anomaly = 1
-            multi_point_anomaly = 0
+            subcat = "point_single"
             location_meta = f"{info_anom['location']}"
-            anomaly_indices = f"{info_anom['anomaly_indices']}"
-
+            anomaly_indices = info_anom['anomaly_indices'].tolist() if hasattr(info_anom['anomaly_indices'], 'tolist') else info_anom['anomaly_indices']
+            anomaly_count = 1
         elif anomaly_type == 'multiple':
             df, info_anom = ts.generate_point_anomalies(df)
             label = f"{kind}_multiple_point_anomalies_{l}"
-            multi_point_anomaly = 1
-            point_anomaly = 0
+            subcat = "point_multiple"
             location_meta = "multiple"
-            anomaly_indices = f"{info_anom['anomaly_indices']}"
+            anomaly_indices = info_anom['anomaly_indices'].tolist() if hasattr(info_anom['anomaly_indices'], 'tolist') else info_anom['anomaly_indices']
+            anomaly_count = len(anomaly_indices)
         else:
             raise ValueError("Invalid anomaly_type. Must be 'single' or 'multiple'.")
 
@@ -124,13 +102,15 @@ def generate_point_anomaly_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="anomaly",
+            sub_category=subcat,
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
-            point_anomaly=point_anomaly,
-            multi_point_anomaly=multi_point_anomaly,
-            location_point=location_meta,
-            location_point_pts=anomaly_indices
+            anomaly_type=subcat,
+            anomaly_count=anomaly_count,
+            anomaly_indices=anomaly_indices,
+            location_point=location_meta
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
@@ -152,31 +132,6 @@ def generate_collective_anomaly_dataset(
 ):
     """
     Generate collective anomaly dataset.
-
-    Parameters
-    ----------
-    ts_generator_class : class
-        TimeSeriesGenerator class
-    folder : str
-        Output folder path
-    kind : str, default='ar'
-        Base series type ('ar', 'ma', 'arma', 'white_noise')
-    count : int, default=5
-        Number of series to generate
-    length_range : tuple, default=(300, 500)
-        (min, max) length for generated series
-    anomaly_type : str, default='single'
-        'single' or 'multiple'
-    location : str, default='middle'
-        Location of anomaly ('beginning', 'middle', 'end')
-    num_anomalies : int, default=2
-        Number of anomalies (for multiple type)
-    scale_factor : float, default=1
-        Scale factor for anomaly magnitude
-
-    Returns
-    -------
-    None
     """
     os.makedirs(folder, exist_ok=True)
     all_dfs = []
@@ -195,21 +150,22 @@ def generate_collective_anomaly_dataset(
                 df, num_anomalies=1, location=loc, scale_factor=scale_factor
             )
             label = f"{kind}_single_collective_anomaly_{loc}_{l}"
-            collective_anomaly = 1
-            multi_collective_anomaly = 0
+            subcat = "collective_single"
             location_meta = f"{info_anom['location']}"
-            anomaly_indices = f"{info_anom['starts']}, {info_anom['ends']}"
-
+            anomaly_indices = {"starts": info_anom['starts'].tolist() if hasattr(info_anom['starts'], 'tolist') else info_anom['starts'],
+                               "ends": info_anom['ends'].tolist() if hasattr(info_anom['ends'], 'tolist') else info_anom['ends']}
+            anomaly_count = 1
         elif anomaly_type == 'multiple':
             k = max(2, int(num_anomalies))
             df, info_anom = ts.generate_collective_anomalies(
                 df, num_anomalies=k, location=location, scale_factor=scale_factor
             )
             label = f"{kind}_multiple_collective_anomalies_{l}"
-            collective_anomaly = 0
-            multi_collective_anomaly = 1
+            subcat = "collective_multiple"
             location_meta = "multiple"
-            anomaly_indices = f"{info_anom['starts']}, {info_anom['ends']}"
+            anomaly_indices = {"starts": info_anom['starts'].tolist() if hasattr(info_anom['starts'], 'tolist') else info_anom['starts'],
+                               "ends": info_anom['ends'].tolist() if hasattr(info_anom['ends'], 'tolist') else info_anom['ends']}
+            anomaly_count = k
         else:
             raise ValueError("Invalid anomaly_type. Must be 'single' or 'multiple'.")
 
@@ -223,13 +179,15 @@ def generate_collective_anomaly_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="anomaly",
+            sub_category=subcat,
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
-            collective_anomaly=collective_anomaly,
-            multi_collective_anomaly=multi_collective_anomaly,
-            location_collective=location_meta,
-            location_collective_pts=anomaly_indices
+            anomaly_type=subcat,
+            anomaly_count=anomaly_count,
+            anomaly_indices=anomaly_indices,
+            location_collective=location_meta
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
@@ -250,29 +208,6 @@ def generate_contextual_anomaly_dataset(
 ):
     """
     Generate contextual anomaly dataset.
-
-    Parameters
-    ----------
-    ts_generator_class : class
-        TimeSeriesGenerator class
-    folder : str
-        Output folder path
-    count : int, default=5
-        Number of series to generate
-    anomaly_type : str, default='single'
-        'single' or 'multiple'
-    length_range : tuple, default=(300, 500)
-        (min, max) length for generated series
-    location : str, default='middle'
-        Location of anomaly ('beginning', 'middle', 'end')
-    num_anomalies : int, default=2
-        Number of anomalies (for multiple type)
-    scale_factor : float, default=1
-        Scale factor for anomaly magnitude
-
-    Returns
-    -------
-    None
     """
     os.makedirs(folder, exist_ok=True)
     all_dfs = []
@@ -296,11 +231,11 @@ def generate_contextual_anomaly_dataset(
                 print(f"Skipping one contextual anomaly generation for {folder} due to anomaly error.")
                 continue
             label = f"single_contextual_anomaly_{loc}_{l}"
-            contextual_anomaly = 1
-            multi_contextual_anomaly = 0
+            subcat = "contextual_single"
             location_meta = f"{info2['location']}"
-            anomaly_indices = f"{info2['starts']}, {info2['ends']}"
-
+            anomaly_indices = {"starts": info2['starts'].tolist() if hasattr(info2['starts'], 'tolist') else info2['starts'],
+                               "ends": info2['ends'].tolist() if hasattr(info2['ends'], 'tolist') else info2['ends']}
+            anomaly_count = 1
         elif anomaly_type == 'multiple':
             k = max(2, int(num_anomalies))
             df, info2 = ts.generate_contextual_anomalies(
@@ -310,10 +245,11 @@ def generate_contextual_anomaly_dataset(
                 print(f"Skipping one contextual anomaly generation for {folder} due to anomaly error.")
                 continue
             label = f"multiple_contextual_anomalies_{l}"
-            contextual_anomaly = 0
-            multi_contextual_anomaly = 1
+            subcat = "contextual_multiple"
             location_meta = "multiple"
-            anomaly_indices = f"{info2['starts']}, {info2['ends']}"
+            anomaly_indices = {"starts": info2['starts'].tolist() if hasattr(info2['starts'], 'tolist') else info2['starts'],
+                               "ends": info2['ends'].tolist() if hasattr(info2['ends'], 'tolist') else info2['ends']}
+            anomaly_count = k
         else:
             raise ValueError("Invalid anomaly_type. Must be 'single' or 'multiple'.")
 
@@ -327,12 +263,13 @@ def generate_contextual_anomaly_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
-            contextual_anomaly=contextual_anomaly,
-            multi_contextual_anomaly=multi_contextual_anomaly,
+            primary_category="anomaly",
+            sub_category=subcat,
+            anomaly_type=subcat,
+            anomaly_count=anomaly_count,
+            anomaly_indices=anomaly_indices,
             location_contextual=location_meta,
-            location_contextual_pts=anomaly_indices,
-            seasonality=1,
-            seasonality_frequency=info1['period']
+            seasonality_periods=[info1['period']]
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)

@@ -63,25 +63,6 @@ def generate_linear_trend_dataset(
 ):
     """
     Generate linear trend dataset.
-
-    Parameters
-    ----------
-    ts_generator_class : class
-        TimeSeriesGenerator class
-    folder : str
-        Output folder path
-    kind : str, default='ar'
-        Base series type ('ar', 'ma', 'arma', 'white_noise')
-    count : int, default=5
-        Number of series to generate
-    length_range : tuple, default=(300, 500)
-        (min, max) length for generated series
-    sign : int, default=1
-        Direction of trend (1 for up, -1 for down)
-
-    Returns
-    -------
-    None
     """
     os.makedirs(folder, exist_ok=True)
     all_dfs = []
@@ -108,11 +89,14 @@ def generate_linear_trend_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="trend",
+            sub_category="linear_up" if sign == 1 else "linear_down",
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
-            linear_trend_up=1 if sign == 1 else 0,
-            linear_trend_down=1 if sign == -1 else 0
+            trend_type="linear",
+            trend_slope=info_trend.get('slope'),
+            trend_intercept=info_trend.get('intercept')
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
@@ -131,25 +115,6 @@ def generate_quadratic_trend_dataset(
 ):
     """
     Generate quadratic trend dataset.
-
-    Parameters
-    ----------
-    ts_generator_class : class
-        TimeSeriesGenerator class
-    folder : str
-        Output folder path
-    kind : str, default='ar'
-        Base series type ('ar', 'ma', 'arma', 'white_noise')
-    count : int, default=5
-        Number of series to generate
-    length_range : tuple, default=(300, 500)
-        (min, max) length for generated series
-    sign : int, default=1
-        Direction of trend
-
-    Returns
-    -------
-    None
     """
     os.makedirs(folder, exist_ok=True)
     all_dfs = []
@@ -174,10 +139,15 @@ def generate_quadratic_trend_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="trend",
+            sub_category="quadratic",
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
-            quadratic_trend=1
+            trend_type="quadratic",
+            trend_coef_a=info_trend.get('a'),
+            trend_coef_b=info_trend.get('b'),
+            trend_coef_c=info_trend.get('c')
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
@@ -196,25 +166,6 @@ def generate_cubic_trend_dataset(
 ):
     """
     Generate cubic trend dataset.
-
-    Parameters
-    ----------
-    ts_generator_class : class
-        TimeSeriesGenerator class
-    folder : str
-        Output folder path
-    kind : str, default='ar'
-        Base series type ('ar', 'ma', 'arma', 'white_noise')
-    count : int, default=5
-        Number of series to generate
-    length_range : tuple, default=(300, 500)
-        (min, max) length for generated series
-    sign : int, default=1
-        Direction of trend
-
-    Returns
-    -------
-    None
     """
     os.makedirs(folder, exist_ok=True)
     all_dfs = []
@@ -239,10 +190,14 @@ def generate_cubic_trend_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="trend",
+            sub_category="cubic",
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
-            cubic_trend=1
+            trend_type="cubic",
+            trend_coef_a=info_trend.get('a'),
+            trend_coef_b=info_trend.get('b')
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
@@ -261,25 +216,6 @@ def generate_exponential_trend_dataset(
 ):
     """
     Generate exponential trend dataset.
-
-    Parameters
-    ----------
-    ts_generator_class : class
-        TimeSeriesGenerator class
-    folder : str
-        Output folder path
-    kind : str, default='ar'
-        Base series type ('ar', 'ma', 'arma', 'white_noise')
-    count : int, default=5
-        Number of series to generate
-    length_range : tuple, default=(300, 500)
-        (min, max) length for generated series
-    sign : int, default=1
-        Direction of trend
-
-    Returns
-    -------
-    None
     """
     os.makedirs(folder, exist_ok=True)
     all_dfs = []
@@ -304,10 +240,14 @@ def generate_exponential_trend_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="trend",
+            sub_category="exponential",
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
-            exponential_trend=1
+            trend_type="exponential",
+            trend_coef_a=info_trend.get('a'),
+            trend_coef_b=info_trend.get('b')
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
@@ -326,25 +266,6 @@ def generate_damped_trend_dataset(
 ):
     """
     Generate damped trend dataset.
-
-    Parameters
-    ----------
-    ts_generator_class : class
-        TimeSeriesGenerator class
-    folder : str
-        Output folder path
-    kind : str, default='ar'
-        Base series type ('ar', 'ma', 'arma', 'white_noise')
-    count : int, default=5
-        Number of series to generate
-    length_range : tuple, default=(300, 500)
-        (min, max) length for generated series
-    sign : int, default=1
-        Direction of trend
-
-    Returns
-    -------
-    None
     """
     os.makedirs(folder, exist_ok=True)
     all_dfs = []
@@ -369,10 +290,13 @@ def generate_damped_trend_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="trend",
+            sub_category="damped",
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
-            damped_trend=1
+            trend_type="damped",
+            trend_damping_rate=info_trend.get('damping_rate'),
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)

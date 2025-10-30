@@ -62,10 +62,12 @@ def generate_random_walk_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="stochastic",
+            sub_category="rw",
             base_series="rw",
             base_coefs=base_coefs,
             order=base_order,
-            stochastic_trend=1
+            stochastic_type="rw"
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
@@ -121,10 +123,13 @@ def generate_random_walk_with_drift_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="stochastic",
+            sub_category="rwd",
             base_series="rwd",
-            order=base_order,
             base_coefs=base_coefs,
-            stochastic_trend=1
+            order=base_order,
+            stochastic_type="rwd",
+            drift_value=info.get('drift')
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
@@ -169,7 +174,7 @@ def generate_ima_dataset(
 
         base_coefs = f"({info['ma_coefs']})"
         base_order = f"({info['ma_order']})"
-        diff = f"({info['diff']})"
+        diff = info['diff']
         label = f"ima_{l}"
         series_id = i + 1
 
@@ -181,10 +186,12 @@ def generate_ima_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="stochastic",
+            sub_category="ima",
             base_series="ima",
             order=base_order,
             base_coefs=base_coefs,
-            stochastic_trend=1,
+            stochastic_type="ima",
             difference=diff
         )
 
@@ -230,7 +237,7 @@ def generate_ari_dataset(
 
         base_coefs = f"({info['ar_coefs']})"
         base_order = f"({info['ar_order']})"
-        diff = f"({info['diff']})"
+        diff = info['diff']
         label = f"ari_{l}"
         series_id = i + 1
 
@@ -242,10 +249,12 @@ def generate_ari_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="stochastic",
+            sub_category="ari",
             base_series="ari",
             order=base_order,
             base_coefs=base_coefs,
-            stochastic_trend=1,
+            stochastic_type="ari",
             difference=diff
         )
 
@@ -291,7 +300,7 @@ def generate_arima_dataset(
 
         base_coefs = f"({info['ar_coefs']},{info['ma_coefs']})"
         base_order = f"({info['ar_order']},{info['ma_order']})"
-        diff = f"({info['diff']})"
+        diff = info['diff']
         label = f"arima_{l}"
         series_id = i + 1
 
@@ -303,10 +312,12 @@ def generate_arima_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="stochastic",
+            sub_category="arima",
             base_series="arima",
             order=base_order,
             base_coefs=base_coefs,
-            stochastic_trend=1,
+            stochastic_type="arima",
             difference=diff
         )
 

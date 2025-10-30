@@ -59,6 +59,8 @@ def generate_wn_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="stationary",
+            sub_category="white_noise",
             base_series="white_noise",
         )
         
@@ -115,6 +117,8 @@ def generate_ar_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="stationary",
+            sub_category="ar",
             base_series="ar",
             base_coefs=base_coefs,
             order=base_order
@@ -173,6 +177,8 @@ def generate_ma_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="stationary",
+            sub_category="ma",
             base_series="ma",
             base_coefs=base_coefs,
             order=base_order
@@ -231,6 +237,8 @@ def generate_arma_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="stationary",
+            sub_category="arma",
             base_series="arma",
             base_coefs=base_coefs,
             order=base_order

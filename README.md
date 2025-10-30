@@ -13,7 +13,7 @@ This library provides a comprehensive toolkit for generating synthetic time seri
 
 - **25+ Time Series Types**: AR, MA, ARMA, ARIMA, SARIMA, GARCH, EGARCH, and more
 - **Reproducible Generation**: Fixed random seed ensures consistent outputs
-- **Complete Metadata**: Each series includes 50+ metadata fields
+- **Complete Metadata**: Each series includes hierarchical, non-redundant metadata fields (50+)
 - **Modular Architecture**: 16 well-organized modules for easy extension
 - **PyPI-Ready**: Professional package structure
 - **Comprehensive Documentation**: Detailed guides and examples
@@ -290,3 +290,28 @@ For questions or feedback, please open an issue on GitHub.
 ---
 
 **Version**: 0.1.0 | **Status**: Production Ready | **License**: MIT
+
+## Metadata Schema (Hierarchical)
+
+Each generated dataset row includes hierarchical, non-redundant metadata fields:
+
+- Core: `series_id`, `time`, `data`, `label`, `length`, `is_stationary`
+- Hierarchy: `primary_category` (stationary | trend | stochastic | seasonality | volatility | anomaly | structural_break), `sub_category`
+- Base process: `base_series`, `base_process_type`, `order`, `base_coefs`
+- Trend: `trend_type`, `trend_slope`, `trend_intercept`, `trend_coef_a`, `trend_coef_b`, `trend_coef_c`, `trend_damping_rate`
+- Stochastic: `stochastic_type`, `difference`, `drift_value`
+- Seasonality: `seasonality_type`, `seasonality_periods`, `seasonality_amplitudes`, `seasonality_from_base`, `seasonal_difference`, `seasonal_ar_order`, `seasonal_ma_order`
+- Volatility: `volatility_type`, `volatility_alpha`, `volatility_beta`, `volatility_omega`, `volatility_theta`, `volatility_lambda`, `volatility_gamma`, `volatility_delta`
+- Anomaly: `anomaly_type`, `anomaly_count`, `anomaly_indices`, `anomaly_magnitudes`
+- Structural Break: `break_type`, `break_count`, `break_indices`, `break_magnitudes`, `break_directions`, `trend_shift_change_types`
+- Locations: `location_point`, `location_collective`, `location_mean_shift`, `location_variance_shift`, `location_trend_shift`, `location_contextual`
+- Noise & Misc: `noise_type`, `noise_std`, `sampling_frequency`
+
+Example (first row transpose view):
+
+```python
+import pandas as pd
+
+df = pd.read_parquet('output/ar.parquet')
+print(df.head(1).T)
+```

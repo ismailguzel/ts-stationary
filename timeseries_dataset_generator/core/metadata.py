@@ -10,234 +10,139 @@ import pandas as pd
 
 
 def create_metadata_record(
+    # === CORE ===
     series_id,
     length,
     label,
     is_stationary=1,
-    base_series=0,
-    order=0,
-    base_coefs=0,
-    linear_trend_up=0,
-    linear_trend_down=0,
-    quadratic_trend=0,
-    cubic_trend=0,
-    exponential_trend=0,
-    damped_trend=0,
-    stochastic_trend=0,
-    difference=0,
-    seasonality=0,
-    multiple_seasonality=0,
-    seasonality_from_base=0,
-    seasonality_frequency=0,
-    seasonal_difference=0,
-    volatility=0,
-    mean_shift_increase=0,
-    mean_shift_decrease=0,
-    multi_mean_shift=0,
-    variance_shift_increase=0,
-    variance_shift_decrease=0,
-    multi_variance_shift=0,
-    trend_shift_slope=0,
-    trend_shift_intercept=0,
-    multi_trend_shift=0,
-    point_anomaly=0,
-    collective_anomaly=0,
-    contextual_anomaly=0,
-    multi_point_anomaly=0,
-    multi_collective_anomaly=0,
-    multi_contextual_anomaly=0,
-    location_point=0,
-    location_collective=0,
-    location_mean_shift=0,
-    location_variance_shift=0,
-    location_trend_shift=0,
-    location_contextual=0,
-    location_point_pts=0,
-    location_collective_pts=0,
-    location_mean_pts=0,
-    location_contextual_pts=0,
-    location_variance_pts=0,
-    location_trend_pts=0,
+    # === NEW: HIERARCHY ===
+    primary_category=None,  # "stationary" | "trend" | "volatility" | ...
+    sub_category=None,   # "linear_up" | "arch" | ...
+    # === BASE ===
+    base_series=None,
+    base_process_type=None,
+    order=None,
+    base_coefs=None,
+    # === TREND ===
+    trend_type=None,
+    trend_slope=None,
+    trend_intercept=None,
+    trend_coef_a=None,
+    trend_coef_b=None,
+    trend_coef_c=None,
+    trend_damping_rate=None,
+    # === STOCHASTIC ===
+    stochastic_type=None,
+    difference=None,
+    drift_value=None,
+    # === SEASONALITY ===
+    seasonality_type=None,
+    seasonality_periods=None,
+    seasonality_amplitudes=None,
+    seasonality_from_base=None,
+    seasonal_difference=None,
+    seasonal_ar_order=None,
+    seasonal_ma_order=None,
+    # === VOLATILITY ===
+    volatility_type=None,
+    volatility_alpha=None,
+    volatility_beta=None,
+    volatility_omega=None,
+    volatility_theta=None,
+    volatility_lambda=None,
+    volatility_gamma=None,
+    volatility_delta=None,
+    # === ANOMALY ===
+    anomaly_type=None,
+    anomaly_count=None,
+    anomaly_indices=None,
+    anomaly_magnitudes=None,
+    # === BREAK ===
+    break_type=None,
+    break_count=None,
+    break_indices=None,
+    break_magnitudes=None,
+    break_directions=None,
+    trend_shift_change_types=None,
+    # === LOCATION ===
+    location_point=None,
+    location_collective=None,
+    location_mean_shift=None,
+    location_variance_shift=None,
+    location_trend_shift=None,
+    location_contextual=None,
+    # === NOISE & ETC ===
+    noise_type=None,
+    noise_std=None,
+    sampling_frequency=None,
 ):
     """
-    Create a metadata record for a time series.
-
-    Parameters
-    ----------
-    series_id : int
-        Unique identifier for the series
-    length : int
-        Length of the time series
-    label : str
-        Label/category of the time series
-    is_stationary : int, default=1
-        Whether the series is stationary (1) or not (0)
-    base_series : str or int, default=0
-        Base stochastic process type (e.g., 'ar', 'ma', 'arma', 'white_noise')
-    order : int or str, default=0
-        Order of the base process
-    base_coefs : int or str, default=0
-        Coefficients of the base process
-    linear_trend_up : int, default=0
-        Presence of upward linear trend
-    linear_trend_down : int, default=0
-        Presence of downward linear trend
-    quadratic_trend : int, default=0
-        Presence of quadratic trend
-    cubic_trend : int, default=0
-        Presence of cubic trend
-    exponential_trend : int, default=0
-        Presence of exponential trend
-    damped_trend : int, default=0
-        Presence of damped trend
-    stochastic_trend : int, default=0
-        Presence of stochastic trend
-    difference : int or str, default=0
-        Order of differencing
-    seasonality : int, default=0
-        Presence of seasonality
-    multiple_seasonality : int, default=0
-        Presence of multiple seasonal components
-    seasonality_from_base : int, default=0
-        Whether seasonality comes from base series (SARMA/SARIMA)
-    seasonality_frequency : int or str, default=0
-        Seasonal period(s)
-    seasonal_difference : int or str, default=0
-        Order of seasonal differencing
-    volatility : int, default=0
-        Presence of volatility clustering
-    mean_shift_increase : int, default=0
-        Presence of mean increase shift
-    mean_shift_decrease : int, default=0
-        Presence of mean decrease shift
-    multi_mean_shift : int, default=0
-        Presence of multiple mean shifts
-    variance_shift_increase : int, default=0
-        Presence of variance increase shift
-    variance_shift_decrease : int, default=0
-        Presence of variance decrease shift
-    multi_variance_shift : int, default=0
-        Presence of multiple variance shifts
-    trend_shift_slope : int, default=0
-        Presence of trend slope shift
-    trend_shift_intercept : int, default=0
-        Presence of trend intercept shift
-    multi_trend_shift : int, default=0
-        Presence of multiple trend shifts
-    point_anomaly : int, default=0
-        Presence of single point anomaly
-    collective_anomaly : int, default=0
-        Presence of single collective anomaly
-    contextual_anomaly : int, default=0
-        Presence of single contextual anomaly
-    multi_point_anomaly : int, default=0
-        Presence of multiple point anomalies
-    multi_collective_anomaly : int, default=0
-        Presence of multiple collective anomalies
-    multi_contextual_anomaly : int, default=0
-        Presence of multiple contextual anomalies
-    location_point : str or int, default=0
-        Location of point anomaly
-    location_collective : str or int, default=0
-        Location of collective anomaly
-    location_mean_shift : str or int, default=0
-        Location of mean shift
-    location_variance_shift : str or int, default=0
-        Location of variance shift
-    location_trend_shift : str or int, default=0
-        Location of trend shift
-    location_contextual : str or int, default=0
-        Location of contextual anomaly
-    location_point_pts : str or int, default=0
-        Specific points/magnitudes for point anomaly
-    location_collective_pts : str or int, default=0
-        Specific points/magnitudes for collective anomaly
-    location_mean_pts : str or int, default=0
-        Specific points/magnitudes for mean shift
-    location_contextual_pts : str or int, default=0
-        Specific points/magnitudes for contextual anomaly
-    location_variance_pts : str or int, default=0
-        Specific points/magnitudes for variance shift
-    location_trend_pts : str or int, default=0
-        Specific points/types for trend shift
-
-    Returns
-    -------
-    dict
-        Dictionary containing all metadata fields
+    Create a non-redundant, hierarchical metadata record for a time series.
     """
     record = {
-        # General
         "series_id": series_id,
         "length": length,
         "label": label,
         "is_stationary": is_stationary,
-
-        # Base stochastic process
+        "primary_category": primary_category,
+        "sub_category": sub_category,
+        # === Base Process ===
         "base_series": base_series,
+        "base_process_type": base_process_type,
         "order": order,
         "base_coefs": base_coefs,
-
-        # Deterministic trends
-        "linear_trend_up": linear_trend_up,
-        "linear_trend_down": linear_trend_down,
-        "quadratic_trend": quadratic_trend,
-        "cubic_trend": cubic_trend,
-        "exponential_trend": exponential_trend,
-        "damped_trend": damped_trend,
-
-        # Stochastic trend
-        "stochastic_trend": stochastic_trend,
+        # === Trend ===
+        "trend_type": trend_type,
+        "trend_slope": trend_slope,
+        "trend_intercept": trend_intercept,
+        "trend_coef_a": trend_coef_a,
+        "trend_coef_b": trend_coef_b,
+        "trend_coef_c": trend_coef_c,
+        "trend_damping_rate": trend_damping_rate,
+        # === Stochastic ===
+        "stochastic_type": stochastic_type,
         "difference": difference,
-
-        # Seasonality
-        "seasonality": seasonality,
-        "multiple_seasonality": multiple_seasonality,
+        "drift_value": drift_value,
+        # === Seasonality ===
+        "seasonality_type": seasonality_type,
+        "seasonality_periods": seasonality_periods,
+        "seasonality_amplitudes": seasonality_amplitudes,
         "seasonality_from_base": seasonality_from_base,
-        "seasonality_frequency": seasonality_frequency,
         "seasonal_difference": seasonal_difference,
-
-        # Volatility
-        "volatility": volatility,
-
-        # Mean shift
-        "mean_shift_increase": mean_shift_increase,
-        "mean_shift_decrease": mean_shift_decrease,
-        "multi_mean_shift": multi_mean_shift,
-
-        # Variance shift
-        "variance_shift_increase": variance_shift_increase,
-        "variance_shift_decrease": variance_shift_decrease,
-        "multi_variance_shift": multi_variance_shift,
-
-        # Trend shift
-        "trend_shift_slope": trend_shift_slope,
-        "trend_shift_intercept": trend_shift_intercept,
-        "multi_trend_shift": multi_trend_shift,
-
-        # Anomaly types
-        "point_anomaly": point_anomaly,
-        "collective_anomaly": collective_anomaly,
-        "contextual_anomaly": contextual_anomaly,
-        "multi_point_anomaly": multi_point_anomaly,
-        "multi_collective_anomaly": multi_collective_anomaly,
-        "multi_contextual_anomaly": multi_contextual_anomaly,
-
-        # Anomaly locations
+        "seasonal_ar_order": seasonal_ar_order,
+        "seasonal_ma_order": seasonal_ma_order,
+        # === Volatility ===
+        "volatility_type": volatility_type,
+        "volatility_alpha": volatility_alpha,
+        "volatility_beta": volatility_beta,
+        "volatility_omega": volatility_omega,
+        "volatility_theta": volatility_theta,
+        "volatility_lambda": volatility_lambda,
+        "volatility_gamma": volatility_gamma,
+        "volatility_delta": volatility_delta,
+        # === Anomaly ===
+        "anomaly_type": anomaly_type,
+        "anomaly_count": anomaly_count,
+        "anomaly_indices": anomaly_indices,
+        "anomaly_magnitudes": anomaly_magnitudes,
+        # === Break ===
+        "break_type": break_type,
+        "break_count": break_count,
+        "break_indices": break_indices,
+        "break_magnitudes": break_magnitudes,
+        "break_directions": break_directions,
+        "trend_shift_change_types": trend_shift_change_types,
+        # === Location ===
         "location_point": location_point,
         "location_collective": location_collective,
         "location_mean_shift": location_mean_shift,
         "location_variance_shift": location_variance_shift,
         "location_trend_shift": location_trend_shift,
         "location_contextual": location_contextual,
-
-        # Anomaly location points/magnitude info
-        "location_point_pts": location_point_pts,
-        "location_collective_pts": location_collective_pts,
-        "location_mean_pts": location_mean_pts,
-        "location_contextual_pts": location_contextual_pts,
-        "location_variance_pts": location_variance_pts,
-        "location_trend_pts": location_trend_pts
+        # === Noise & ETC ===
+        "noise_type": noise_type,
+        "noise_std": noise_std,
+        "sampling_frequency": sampling_frequency,
     }
     return record
 

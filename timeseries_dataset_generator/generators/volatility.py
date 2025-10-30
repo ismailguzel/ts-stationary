@@ -22,21 +22,6 @@ def generate_arch_dataset(
 ):
     """
     Generate ARCH dataset.
-
-    Parameters
-    ----------
-    ts_generator_class : class
-        TimeSeriesGenerator class
-    folder : str
-        Output folder path
-    count : int, default=20
-        Number of series to generate
-    length_range : tuple, default=(50, 100)
-        (min, max) length for generated series
-
-    Returns
-    -------
-    None
     """
     os.makedirs(folder, exist_ok=True)
     all_dfs = []
@@ -47,28 +32,27 @@ def generate_arch_dataset(
         length = np.random.randint(*length_range)
         ts = ts_generator_class(length=length)
         df, info = ts.generate_volatility(kind='arch')
-        
-        base_coefs = f"({info['alpha']},{info['omega']})"
-        label = f"arch_{l}"
-        series_id = i + 1
 
+        # Yeni metadata
+        series_id = i + 1
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
-
         record = create_metadata_record(
             series_id=series_id,
             length=length,
-            label=label,
+            label=f"arch_{l}",
             is_stationary=is_stat_flag,
+            primary_category="volatility",
+            sub_category="arch",
             base_series="arch",
-            base_coefs=base_coefs,
-            volatility=1
+            base_coefs=None,
+            volatility_type="arch",
+            volatility_alpha=info.get("alpha"),
+            volatility_omega=info.get("omega"),
         )
-
         df_with_meta = attach_metadata_columns_to_df(df, record)
         all_dfs.append(df_with_meta)
-        
-    save_and_cleanup(all_dfs, folder, count, label)
+    save_and_cleanup(all_dfs, folder, count, f"arch_{l}")
 
 
 def generate_garch_dataset(
@@ -105,27 +89,27 @@ def generate_garch_dataset(
         ts = ts_generator_class(length=length)
         df, info = ts.generate_volatility(kind='garch')
 
-        base_coefs = f"({info['alpha']},{info['beta']},{info['omega']})"
-        label = f"garch_{l}"
+        # Yeni metadata
         series_id = i + 1
-
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
-
         record = create_metadata_record(
             series_id=series_id,
             length=length,
-            label=label,
+            label=f"garch_{l}",
             is_stationary=is_stat_flag,
+            primary_category="volatility",
+            sub_category="garch",
             base_series="garch",
-            base_coefs=base_coefs,
-            volatility=1
+            base_coefs=None,
+            volatility_type="garch",
+            volatility_alpha=info.get("alpha"),
+            volatility_beta=info.get("beta"),
+            volatility_omega=info.get("omega"),
         )
-
         df_with_meta = attach_metadata_columns_to_df(df, record)
         all_dfs.append(df_with_meta)
-
-    save_and_cleanup(all_dfs, folder, count, label)
+    save_and_cleanup(all_dfs, folder, count, f"garch_{l}")
 
 
 def generate_egarch_dataset(
@@ -162,27 +146,29 @@ def generate_egarch_dataset(
         ts = ts_generator_class(length=length)
         df, info = ts.generate_volatility(kind='egarch')
 
-        base_coefs = f"({info['alpha']},{info['beta']},{info['theta']},{info['lambda']},{info['omega']})"
-        label = f"egarch_{l}"
+        # Yeni metadata
         series_id = i + 1
-
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
-
         record = create_metadata_record(
             series_id=series_id,
             length=length,
-            label=label,
+            label=f"egarch_{l}",
             is_stationary=is_stat_flag,
+            primary_category="volatility",
+            sub_category="egarch",
             base_series="egarch",
-            base_coefs=base_coefs,
-            volatility=1
+            base_coefs=None,
+            volatility_type="egarch",
+            volatility_alpha=info.get("alpha"),
+            volatility_beta=info.get("beta"),
+            volatility_omega=info.get("omega"),
+            volatility_theta=info.get("theta"),
+            volatility_lambda=info.get("lambda"),
         )
-
         df_with_meta = attach_metadata_columns_to_df(df, record)
         all_dfs.append(df_with_meta)
-        
-    save_and_cleanup(all_dfs, folder, count, label)
+    save_and_cleanup(all_dfs, folder, count, f"egarch_{l}")
 
 
 def generate_aparch_dataset(
@@ -219,25 +205,27 @@ def generate_aparch_dataset(
         ts = ts_generator_class(length=length)
         df, info = ts.generate_volatility(kind='aparch')
 
-        base_coefs = f"({info['alpha']},{info['beta']},{info['gamma']},{info['delta']},{info['omega']})"
-        label = f"aparch_{l}"
+        # Yeni metadata
         series_id = i + 1
-
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
-
         record = create_metadata_record(
             series_id=series_id,
             length=length,
-            label=label,
+            label=f"aparch_{l}",
             is_stationary=is_stat_flag,
+            primary_category="volatility",
+            sub_category="aparch",
             base_series="aparch",
-            base_coefs=base_coefs,
-            volatility=1
+            base_coefs=None,
+            volatility_type="aparch",
+            volatility_alpha=info.get("alpha"),
+            volatility_beta=info.get("beta"),
+            volatility_omega=info.get("omega"),
+            volatility_gamma=info.get("gamma"),
+            volatility_delta=info.get("delta"),
         )
-
         df_with_meta = attach_metadata_columns_to_df(df, record)
         all_dfs.append(df_with_meta)
-        
-    save_and_cleanup(all_dfs, folder, count, label)
+    save_and_cleanup(all_dfs, folder, count, f"aparch_{l}")
 

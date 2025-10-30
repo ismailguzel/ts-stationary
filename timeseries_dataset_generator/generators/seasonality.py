@@ -22,21 +22,6 @@ def generate_single_seasonality_dataset(
 ):
     """
     Generate single seasonality dataset.
-
-    Parameters
-    ----------
-    ts_generator_class : class
-        TimeSeriesGenerator class
-    folder : str
-        Output folder path
-    count : int, default=20
-        Number of series to generate
-    length_range : tuple, default=(50, 100)
-        (min, max) length for generated series
-
-    Returns
-    -------
-    None
     """
     os.makedirs(folder, exist_ok=True)
     all_dfs = []
@@ -50,7 +35,7 @@ def generate_single_seasonality_dataset(
         if df is None: 
             continue
         
-        period = f"({info['period']})"
+        period = info['period']
         label = f"single_seasonality_{l}"
         series_id = i + 1
 
@@ -62,8 +47,9 @@ def generate_single_seasonality_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
-            seasonality=1,
-            seasonality_frequency=period
+            primary_category="seasonality",
+            sub_category="single",
+            seasonality_periods=[period]
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
@@ -81,23 +67,6 @@ def generate_multiple_seasonality_dataset(
 ):
     """
     Generate multiple seasonality dataset.
-
-    Parameters
-    ----------
-    ts_generator_class : class
-        TimeSeriesGenerator class
-    folder : str
-        Output folder path
-    count : int, default=20
-        Number of series to generate
-    num_components : int, default=2
-        Number of seasonal components
-    length_range : tuple, default=(50, 100)
-        (min, max) length for generated series
-
-    Returns
-    -------
-    None
     """
     os.makedirs(folder, exist_ok=True)
     all_dfs = []
@@ -111,7 +80,7 @@ def generate_multiple_seasonality_dataset(
         if df is None: 
             continue
         
-        periods = f"({info['periods']})"
+        periods = info['periods']
         label = f"multiple_seasonality_{l}"
         series_id = i + 1
 
@@ -123,8 +92,9 @@ def generate_multiple_seasonality_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
-            multiple_seasonality=1,
-            seasonality_frequency=periods
+            primary_category="seasonality",
+            sub_category="multiple",
+            seasonality_periods=periods
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
@@ -141,21 +111,6 @@ def generate_sarma_dataset(
 ):
     """
     Generate SARMA (Seasonal ARMA) dataset.
-
-    Parameters
-    ----------
-    ts_generator_class : class
-        TimeSeriesGenerator class
-    folder : str
-        Output folder path
-    count : int, default=20
-        Number of series to generate
-    length_range : tuple, default=(50, 100)
-        (min, max) length for generated series
-
-    Returns
-    -------
-    None
     """
     os.makedirs(folder, exist_ok=True)
     all_dfs = []
@@ -172,9 +127,9 @@ def generate_sarma_dataset(
              
         base_coefs = f"({info['coefs']})"
         base_order = f"({info['ar_order']}, {info['ma_order']}, {info['seasonal_ar_order']}, {info['seasonal_ma_order']})"
-        period = f"({info['period']})"
-        diff = f"({info['diff']})"
-        seasonal_diff = f"({info['seasonal_diff']})"
+        period = info['period']
+        diff = info['diff']
+        seasonal_diff = info['seasonal_diff']
         label = f"sarma_seasonality_{l}"
         series_id = i + 1
 
@@ -186,13 +141,17 @@ def generate_sarma_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="seasonality",
+            sub_category="sarma",
             base_series='sarma',
             seasonality_from_base=1,
-            seasonality_frequency=period,
+            seasonality_periods=[period],
             base_coefs=base_coefs,
             order=base_order,
             difference=diff,
-            seasonal_difference=seasonal_diff
+            seasonal_difference=seasonal_diff,
+            seasonal_ar_order=info['seasonal_ar_order'],
+            seasonal_ma_order=info['seasonal_ma_order']
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
@@ -209,21 +168,6 @@ def generate_sarima_dataset(
 ):
     """
     Generate SARIMA (Seasonal ARIMA) dataset.
-
-    Parameters
-    ----------
-    ts_generator_class : class
-        TimeSeriesGenerator class
-    folder : str
-        Output folder path
-    count : int, default=20
-        Number of series to generate
-    length_range : tuple, default=(50, 100)
-        (min, max) length for generated series
-
-    Returns
-    -------
-    None
     """
     os.makedirs(folder, exist_ok=True)
     all_dfs = []
@@ -240,9 +184,9 @@ def generate_sarima_dataset(
 
         base_coefs = f"({info['coefs']})"
         base_order = f"({info['ar_order']}, {info['ma_order']}, {info['seasonal_ar_order']}, {info['seasonal_ma_order']})"
-        period = f"({info['period']})"
-        diff = f"({info['diff']})"
-        seasonal_diff = f"({info['seasonal_diff']})"
+        period = info['period']
+        diff = info['diff']
+        seasonal_diff = info['seasonal_diff']
         label = f"sarima_seasonality_{l}"
         series_id = i + 1
 
@@ -254,13 +198,17 @@ def generate_sarima_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            primary_category="seasonality",
+            sub_category="sarima",
             base_series='sarima',
             seasonality_from_base=1,
-            seasonality_frequency=period,
+            seasonality_periods=[period],
             base_coefs=base_coefs,
             order=base_order,
             difference=diff,
-            seasonal_difference=seasonal_diff
+            seasonal_difference=seasonal_diff,
+            seasonal_ar_order=info['seasonal_ar_order'],
+            seasonal_ma_order=info['seasonal_ma_order']
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)

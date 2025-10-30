@@ -14,6 +14,9 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
+import matplotlib
+matplotlib.use("Agg")  # veya kuruluysa 'TkAgg'
+
 # Add library to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 

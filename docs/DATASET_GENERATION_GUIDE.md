@@ -276,6 +276,10 @@ CONFIG = {
 }
 ```
 
+## Metadata Schema
+
+All generated datasets include hierarchical, non-redundant metadata fields (categories + parameters). See the Metadata Schema section in the main README for the complete field list and an example preview.
+
 ## Support
 
 For issues or questions:
