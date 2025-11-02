@@ -18,7 +18,8 @@ def generate_arch_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate ARCH dataset.
@@ -34,7 +35,7 @@ def generate_arch_dataset(
         df, info = ts.generate_volatility(kind='arch')
 
         # Yeni metadata
-        series_id = i + 1
+        series_id = start_id + i
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
         record = create_metadata_record(
@@ -59,7 +60,8 @@ def generate_garch_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate GARCH dataset.
@@ -74,6 +76,8 @@ def generate_garch_dataset(
         Number of series to generate
     length_range : tuple, default=(50, 100)
         (min, max) length for generated series
+    start_id : int, default=1
+        Starting ID for series_id
 
     Returns
     -------
@@ -90,7 +94,7 @@ def generate_garch_dataset(
         df, info = ts.generate_volatility(kind='garch')
 
         # Yeni metadata
-        series_id = i + 1
+        series_id = start_id + i
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
         record = create_metadata_record(
@@ -116,7 +120,8 @@ def generate_egarch_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate EGARCH dataset.
@@ -131,6 +136,8 @@ def generate_egarch_dataset(
         Number of series to generate
     length_range : tuple, default=(50, 100)
         (min, max) length for generated series
+    start_id : int, default=1
+        Starting ID for series_id
 
     Returns
     -------
@@ -147,7 +154,7 @@ def generate_egarch_dataset(
         df, info = ts.generate_volatility(kind='egarch')
 
         # Yeni metadata
-        series_id = i + 1
+        series_id = start_id + i
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
         record = create_metadata_record(
@@ -175,7 +182,8 @@ def generate_aparch_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate APARCH dataset.
@@ -190,6 +198,8 @@ def generate_aparch_dataset(
         Number of series to generate
     length_range : tuple, default=(50, 100)
         (min, max) length for generated series
+    start_id : int, default=1
+        Starting ID for series_id
 
     Returns
     -------
@@ -206,7 +216,7 @@ def generate_aparch_dataset(
         df, info = ts.generate_volatility(kind='aparch')
 
         # Yeni metadata
-        series_id = i + 1
+        series_id = start_id + i
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
         record = create_metadata_record(

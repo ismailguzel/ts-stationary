@@ -18,7 +18,8 @@ def generate_single_seasonality_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate single seasonality dataset.
@@ -37,7 +38,7 @@ def generate_single_seasonality_dataset(
         
         period = info['period']
         label = f"single_seasonality_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -63,7 +64,8 @@ def generate_multiple_seasonality_dataset(
     folder,
     count=20,
     num_components=2,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate multiple seasonality dataset.
@@ -82,7 +84,7 @@ def generate_multiple_seasonality_dataset(
         
         periods = info['periods']
         label = f"multiple_seasonality_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -107,7 +109,8 @@ def generate_sarma_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate SARMA (Seasonal ARMA) dataset.
@@ -131,7 +134,7 @@ def generate_sarma_dataset(
         diff = info['diff']
         seasonal_diff = info['seasonal_diff']
         label = f"sarma_seasonality_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -164,7 +167,8 @@ def generate_sarima_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate SARIMA (Seasonal ARIMA) dataset.
@@ -188,7 +192,7 @@ def generate_sarima_dataset(
         diff = info['diff']
         seasonal_diff = info['seasonal_diff']
         label = f"sarima_seasonality_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])

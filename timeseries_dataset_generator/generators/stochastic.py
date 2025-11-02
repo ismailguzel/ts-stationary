@@ -19,7 +19,8 @@ def generate_random_walk_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate random walk dataset.
@@ -34,6 +35,8 @@ def generate_random_walk_dataset(
         Number of series to generate
     length_range : tuple, default=(50, 100)
         (min, max) length for generated series
+    start_id : int, default=1
+        Starting ID for series_id
 
     Returns
     -------
@@ -52,7 +55,7 @@ def generate_random_walk_dataset(
         base_coefs = 0
         base_order = 0
         label = f"random_walk_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -80,7 +83,8 @@ def generate_random_walk_with_drift_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate random walk with drift dataset.
@@ -95,6 +99,8 @@ def generate_random_walk_with_drift_dataset(
         Number of series to generate
     length_range : tuple, default=(50, 100)
         (min, max) length for generated series
+    start_id : int, default=1
+        Starting ID for series_id
 
     Returns
     -------
@@ -113,7 +119,7 @@ def generate_random_walk_with_drift_dataset(
         base_coefs = 0
         base_order = 0
         label = f"random_walk_drift_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -142,7 +148,8 @@ def generate_ima_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate IMA (Integrated Moving Average) dataset.
@@ -157,6 +164,8 @@ def generate_ima_dataset(
         Number of series to generate
     length_range : tuple, default=(50, 100)
         (min, max) length for generated series
+    start_id : int, default=1
+        Starting ID for series_id
 
     Returns
     -------
@@ -176,7 +185,7 @@ def generate_ima_dataset(
         base_order = f"({info['ma_order']})"
         diff = info['diff']
         label = f"ima_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -205,7 +214,8 @@ def generate_ari_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate ARI (Autoregressive Integrated) dataset.
@@ -220,6 +230,8 @@ def generate_ari_dataset(
         Number of series to generate
     length_range : tuple, default=(50, 100)
         (min, max) length for generated series
+    start_id : int, default=1
+        Starting ID for series_id
 
     Returns
     -------
@@ -239,7 +251,7 @@ def generate_ari_dataset(
         base_order = f"({info['ar_order']})"
         diff = info['diff']
         label = f"ari_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -268,7 +280,8 @@ def generate_arima_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate ARIMA (Autoregressive Integrated Moving Average) dataset.
@@ -283,6 +296,8 @@ def generate_arima_dataset(
         Number of series to generate
     length_range : tuple, default=(50, 100)
         (min, max) length for generated series
+    start_id : int, default=1
+        Starting ID for series_id
 
     Returns
     -------
@@ -302,7 +317,7 @@ def generate_arima_dataset(
         base_order = f"({info['ar_order']},{info['ma_order']})"
         diff = info['diff']
         label = f"arima_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])

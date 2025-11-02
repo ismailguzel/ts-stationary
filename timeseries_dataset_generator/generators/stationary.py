@@ -18,7 +18,8 @@ def generate_wn_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate white noise dataset.
@@ -33,6 +34,8 @@ def generate_wn_dataset(
         Number of series to generate
     length_range : tuple, default=(50, 100)
         (min, max) length for generated series
+    start_id : int, default=1
+        Starting ID for series_id
 
     Returns
     -------
@@ -49,7 +52,7 @@ def generate_wn_dataset(
         df, info = ts.generate_stationary_base_series('white_noise')
 
         label = f"white_noise_{l}"
-        series_id = i + 1 
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -74,7 +77,8 @@ def generate_ar_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate AR (Autoregressive) dataset.
@@ -89,6 +93,8 @@ def generate_ar_dataset(
         Number of series to generate
     length_range : tuple, default=(50, 100)
         (min, max) length for generated series
+    start_id : int, default=1
+        Starting ID for series_id
 
     Returns
     -------
@@ -107,7 +113,7 @@ def generate_ar_dataset(
         base_coefs = f"({info['ar_coefs']})"
         base_order = f"({info['ar_order']})"
         label = f"ar_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -134,7 +140,8 @@ def generate_ma_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate MA (Moving Average) dataset.
@@ -149,6 +156,8 @@ def generate_ma_dataset(
         Number of series to generate
     length_range : tuple, default=(50, 100)
         (min, max) length for generated series
+    start_id : int, default=1
+        Starting ID for series_id
 
     Returns
     -------
@@ -167,7 +176,7 @@ def generate_ma_dataset(
         base_coefs = f"({info['ma_coefs']})"
         base_order = f"({info['ma_order']})"
         label = f"ma_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -194,7 +203,8 @@ def generate_arma_dataset(
     ts_generator_class,
     folder,
     count=20,
-    length_range=(50, 100)
+    length_range=(50, 100),
+    start_id=1
 ):
     """
     Generate ARMA (Autoregressive Moving Average) dataset.
@@ -209,6 +219,8 @@ def generate_arma_dataset(
         Number of series to generate
     length_range : tuple, default=(50, 100)
         (min, max) length for generated series
+    start_id : int, default=1
+        Starting ID for series_id
 
     Returns
     -------
@@ -227,7 +239,7 @@ def generate_arma_dataset(
         base_coefs = f"({info['ar_coefs']},{info['ma_coefs']})"
         base_order = f"({info['ar_order']},{info['ma_order']})"
         label = f"arma_{l}"
-        series_id = i + 1 
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])

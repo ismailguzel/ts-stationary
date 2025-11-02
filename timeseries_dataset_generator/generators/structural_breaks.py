@@ -62,7 +62,8 @@ def generate_mean_shift_dataset(
     location="middle",              
     num_breaks=2,
     scale_factor=1,
-    seasonal_period=None
+    seasonal_period=None,
+    start_id=1
 ):
     """
     Generate mean shift dataset.
@@ -102,7 +103,7 @@ def generate_mean_shift_dataset(
         shift_magnitudes = info2['shift_magnitudes']
         break_count_val = len(shift_indices)
 
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -142,7 +143,8 @@ def generate_variance_shift_dataset(
     location="middle",              
     num_breaks=2,
     scale_factor=1,
-    seasonal_period=None
+    seasonal_period=None,
+    start_id=1
 ):
     """
     Generate variance shift dataset.
@@ -182,7 +184,7 @@ def generate_variance_shift_dataset(
         shift_magnitudes = info2['shift_magnitudes']
         break_count_val = len(shift_indices)
 
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -223,7 +225,8 @@ def generate_trend_shift_dataset(
     num_breaks=2,
     scale_factor=1,
     seasonal_period=None,
-    sign=None
+    sign=None,
+    start_id=1
 ):
     """
     Generate trend shift dataset.
@@ -271,7 +274,7 @@ def generate_trend_shift_dataset(
         shift_types = info2['shift_types']
         break_count_val = len(shift_indices)
 
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])

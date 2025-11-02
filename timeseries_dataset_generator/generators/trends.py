@@ -59,7 +59,8 @@ def generate_linear_trend_dataset(
     kind='ar',
     count=5,
     length_range=(300, 500),
-    sign=1
+    sign=1,
+    start_id=1
 ):
     """
     Generate linear trend dataset.
@@ -79,7 +80,7 @@ def generate_linear_trend_dataset(
         df, info_trend = ts.generate_deterministic_trend_linear(df, sign=sign)
 
         label = f"{kind}_linear_trend_{l}_{trend_label}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -111,7 +112,8 @@ def generate_quadratic_trend_dataset(
     kind='ar',
     count=5,
     length_range=(300, 500),
-    sign=1
+    sign=1,
+    start_id=1
 ):
     """
     Generate quadratic trend dataset.
@@ -129,7 +131,7 @@ def generate_quadratic_trend_dataset(
         df, info_trend = ts.generate_deterministic_trend_quadratic(df, sign=sign, location="center")
 
         label = f"{kind}_quadratic_trend_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -162,7 +164,8 @@ def generate_cubic_trend_dataset(
     kind='ar',
     count=5,
     length_range=(300, 500),
-    sign=1
+    sign=1,
+    start_id=1
 ):
     """
     Generate cubic trend dataset.
@@ -180,7 +183,7 @@ def generate_cubic_trend_dataset(
         df, info_trend = ts.generate_deterministic_trend_cubic(df, sign=sign, location="center")
 
         label = f"{kind}_cubic_trend_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -212,7 +215,8 @@ def generate_exponential_trend_dataset(
     kind='ar',
     count=5,
     length_range=(300, 500),
-    sign=1
+    sign=1,
+    start_id=1
 ):
     """
     Generate exponential trend dataset.
@@ -230,7 +234,7 @@ def generate_exponential_trend_dataset(
         df, info_trend = ts.generate_deterministic_trend_exponential(df, sign=sign)
 
         label = f"{kind}_exponential_trend_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -262,7 +266,8 @@ def generate_damped_trend_dataset(
     kind='ar',
     count=5,
     length_range=(300, 500),
-    sign=1
+    sign=1,
+    start_id=1
 ):
     """
     Generate damped trend dataset.
@@ -280,7 +285,7 @@ def generate_damped_trend_dataset(
         df, info_trend = ts.generate_deterministic_trend_damped(df, sign=sign)
 
         label = f"{kind}_damped_trend_{l}"
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])

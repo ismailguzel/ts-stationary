@@ -58,7 +58,8 @@ def generate_point_anomaly_dataset(
     count=5,
     length_range=(300, 500),
     anomaly_type='single',
-    location="middle"
+    location="middle",
+    start_id=1
 ):
     """
     Generate point anomaly dataset.
@@ -92,7 +93,7 @@ def generate_point_anomaly_dataset(
         else:
             raise ValueError("Invalid anomaly_type. Must be 'single' or 'multiple'.")
 
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -128,7 +129,8 @@ def generate_collective_anomaly_dataset(
     anomaly_type='single',          
     location="middle",              
     num_anomalies=2,
-    scale_factor=1
+    scale_factor=1,
+    start_id=1
 ):
     """
     Generate collective anomaly dataset.
@@ -169,7 +171,7 @@ def generate_collective_anomaly_dataset(
         else:
             raise ValueError("Invalid anomaly_type. Must be 'single' or 'multiple'.")
 
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
@@ -204,7 +206,8 @@ def generate_contextual_anomaly_dataset(
     length_range=(300, 500),        
     location="middle",              
     num_anomalies=2,
-    scale_factor=1
+    scale_factor=1,
+    start_id=1
 ):
     """
     Generate contextual anomaly dataset.
@@ -253,7 +256,7 @@ def generate_contextual_anomaly_dataset(
         else:
             raise ValueError("Invalid anomaly_type. Must be 'single' or 'multiple'.")
 
-        series_id = i + 1
+        series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
         df = df.drop(columns=['stationary'])
