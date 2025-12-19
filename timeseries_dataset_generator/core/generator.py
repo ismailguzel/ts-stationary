@@ -406,22 +406,25 @@ class TimeSeriesGenerator:
         return None, None # Hata durumunda None, None döndür
 
 
-    def generate_arch_series(self, length, alpha_range=(0.1, 0.5),omega=0.1,cumulative=False,scale_factor=1):
+    def generate_arch_series(self, length, alpha_range=(0.5, 0.9), omega_range=(0.1, 0.3), cumulative=False, scale_factor=1):
         alpha = np.random.uniform(*alpha_range)
+        omega = np.random.uniform(*omega_range)
+        
         am = arch_model(None, vol='ARCH', p=1, mean='Zero')
         sim = am.simulate([omega, alpha], nobs=length)
         
         series = sim['data'].values * scale_factor
-        info = {'type': 'volatility', 'subtype': 'ARCH', 'alpha': alpha, 'omega' : omega}
+        info = {'type': 'volatility', 'subtype': 'ARCH', 'alpha': alpha, 'omega': omega}
         if cumulative:
             series = np.cumsum(series)
     
         return series, info
 
-    def generate_garch_series(self, length, alpha_range=(0.1, 0.3),beta_range=(0.1, 0.3),omega=0.1,cumulative=False,scale_factor=1):
+    def generate_garch_series(self, length, alpha_range=(0.4, 0.6), beta_range=(0.2, 0.5), omega_range=(0.3, 0.6), cumulative=False, scale_factor=1):
         while True:
             alpha = np.random.uniform(*alpha_range)
             beta = np.random.uniform(*beta_range)
+            omega = np.random.uniform(*omega_range)
             if alpha + beta < 1:
                 break  # Ensure weak stationarity of the variance
     
@@ -429,7 +432,7 @@ class TimeSeriesGenerator:
         sim = am.simulate([omega, alpha, beta], nobs=length)
         
         series = sim['data'].values * scale_factor
-        info = {'type': 'volatility', 'subtype': 'GARCH', 'alpha': alpha, 'beta' : beta, 'omega' : omega}
+        info = {'type': 'volatility', 'subtype': 'GARCH', 'alpha': alpha, 'beta': beta, 'omega': omega}
         if cumulative:
             series = np.cumsum(series)
     
@@ -451,10 +454,17 @@ class TimeSeriesGenerator:
 
         return series, info
 
-    def generate_aparch_series(self, length, omega=0.1, alpha_range=(0.1, 0.3), beta_range=(0.6, 0.9),gamma_range=(-0.3, 0.3), delta=1.5, cumulative=False, scale_factor=1):
-        alpha = np.random.uniform(*alpha_range)
-        beta = np.random.uniform(*beta_range)
+    def generate_aparch_series(self, length, omega_range=(0.1, 0.3), alpha_range=(0.1, 0.3), beta_range=(0.5, 0.8), gamma_range=(-0.3, 0.3), delta_range=(1.0, 2.0), cumulative=False, scale_factor=1):
+        # Stationarity constraint: alpha + beta < 1
+        while True:
+            alpha = np.random.uniform(*alpha_range)
+            beta = np.random.uniform(*beta_range)
+            if alpha + beta < 1:
+                break
+        
+        omega = np.random.uniform(*omega_range)
         gamma = np.random.uniform(*gamma_range)
+        delta = np.random.uniform(*delta_range)
 
         from arch import arch_model
         am = arch_model(None, vol='APARCH', p=1, o=1, q=1, mean='Zero', dist='normal')
@@ -462,7 +472,7 @@ class TimeSeriesGenerator:
         sim = am.simulate([omega, alpha, gamma, beta, delta], nobs=length)
 
         series = sim['data'].values * scale_factor
-        info = {'type': 'volatility', 'subtype': 'APARCH', 'alpha': alpha, 'beta' : beta, 'gamma': gamma, 'delta': delta, 'omega' : omega}
+        info = {'type': 'volatility', 'subtype': 'APARCH', 'alpha': alpha, 'beta': beta, 'gamma': gamma, 'delta': delta, 'omega': omega}
         if cumulative:
             series = np.cumsum(series)
 
