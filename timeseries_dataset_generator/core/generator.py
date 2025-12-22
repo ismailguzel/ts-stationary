@@ -438,7 +438,8 @@ class TimeSeriesGenerator:
     
         return series, info
 
-    def generate_egarch_series(self, length, omega=0.1, alpha_range=(0.1, 0.3), beta_range=(0.6, 0.9), theta_range=(-0.3, 0.3), lambda_range=(0.1, 0.3), cumulative=False, scale_factor=1):
+    def generate_egarch_series(self, length, omega_range=(0.1, 0.3), alpha_range=(0.5, 0.9), beta_range=(0.6, 0.9), theta_range=(-0.5, 0.5), lambda_range=(0.1, 0.5), cumulative=False, scale_factor=1):
+        omega = np.random.uniform(*omega_range)
         alpha = np.random.uniform(*alpha_range)
         beta = np.random.uniform(*beta_range)
         theta = np.random.uniform(*theta_range)
@@ -448,7 +449,7 @@ class TimeSeriesGenerator:
         sim = am.simulate([omega, alpha, beta, theta, lam], nobs=length)
 
         series = sim['data'].values * scale_factor
-        info = {'type': 'volatility', 'subtype': 'EGARCH', 'alpha': alpha, 'beta' : beta, 'theta': theta, 'lambda': lam, 'omega' : omega}
+        info = {'type': 'volatility', 'subtype': 'EGARCH', 'alpha': alpha, 'beta': beta, 'theta': theta, 'lambda': lam, 'omega': omega}
         if cumulative:
             series = np.cumsum(series)
 
