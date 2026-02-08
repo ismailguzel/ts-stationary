@@ -19,7 +19,7 @@ This library provides a comprehensive toolkit for generating synthetic time seri
 - **Size**: 120,000 unique univariate time series (23.8 GB total)
 - **Format**: CSV files organized hierarchically
 - **License**: CC-BY-4.0
-- **Conference**: Submitted to KDD 2026 Datasets and Benchmark Track (Cycle 2)
+- **Conference**: Submitted to KDD 2026 Datasets and Benchmark Track
 
 The dataset includes:
 - **Generated_Data.zip** (10.2 GB): Time series with single primary properties
