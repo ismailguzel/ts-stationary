@@ -17,9 +17,7 @@ This library provides a comprehensive toolkit for generating synthetic time seri
 - **Dataset Name**: TSBench: A Comprehensive Benchmark Dataset for Time Series Stationarity and Structural Analysis
 - **DOI**: [10.5281/zenodo.18513505](https://doi.org/10.5281/zenodo.18513505)
 - **Size**: 120,000 unique univariate time series (23.8 GB total)
-- **Format**: CSV files organized hierarchically
-- **License**: CC-BY-4.0
-- **Conference**: Submitted to KDD 2026 Datasets and Benchmark Track
+- **Conference**: Submitted to [KDD 2026 Datasets and Benchmark Track](https://kdd2026.kdd.org/)
 
 The dataset includes:
 - **Generated_Data.zip** (10.2 GB): Time series with single primary properties
