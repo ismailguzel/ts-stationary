@@ -494,7 +494,9 @@ class TimeSeriesGenerator:
         df = pd.DataFrame({
             'time': np.arange(self.length),
             'data': series,
-            'stationary': (np.ones(self.length)).astype(int)
+            'stationary': (np.ones(self.length)).astype(int),
+            'seasonal': np.zeros(self.length).astype(int),
+
         })
         return df, info
 
@@ -755,6 +757,7 @@ class TimeSeriesGenerator:
         df.loc[:, 'data'] = series
         df.loc[:, 'stationary'] = 0
         df.loc[:, 'context_anom'] = 1
+        df.loc[:, 'seasonal'] = 1
         return df, info
 
 
@@ -806,9 +809,9 @@ class TimeSeriesGenerator:
         info = {'type' : 'trend', 'subtype': 'deterministic_quadratic','sign': sign, 'a': a, 'b': b, 'c': c}
     
         series += trend + noise
-        df['data'] = series
-        df['stationary'] = 0
-        df['det_quad'] = 1
+        df.loc[:, 'data'] = series
+        df.loc[:, 'stationary'] = 0
+        df.loc[:, 'det_quad'] = 1
         return df, info
 
     def generate_deterministic_trend_cubic(self, df, sign=None, amplitude=10, noise_std=None,scale_factor=1, asymmetric=False, location="center"):
@@ -845,9 +848,9 @@ class TimeSeriesGenerator:
 
         info = {'type' : 'trend', 'subtype': 'deterministic_cubic','sign': sign, 'a': a, 'b': b}
         
-        df['data'] = series
-        df['stationary'] = 0
-        df['det_cubic'] = 1
+        df.loc[:, 'data'] = series
+        df.loc[:, 'stationary'] = 0
+        df.loc[:, 'det_cubic'] = 1
         return df, info
 
     def generate_deterministic_trend_exponential(self, df, sign=None, a=None, b=None, noise_std=None, scale_factor=1):
@@ -876,9 +879,9 @@ class TimeSeriesGenerator:
 
         info = {'type' : 'trend', 'subtype': 'deterministic_exponential','sign': sign, 'a': a, 'b': b}
     
-        df['data'] = series
-        df['stationary'] = 0
-        df['det_exp'] = 1
+        df.loc[:, 'data'] = series
+        df.loc[:, 'stationary'] = 0
+        df.loc[:, 'det_exp'] = 1
         return df, info
 
     def generate_deterministic_trend_damped(self, df, sign=None, a=None, b=None, damping_rate=None, noise_std=None, scale_factor=1):
@@ -931,7 +934,8 @@ class TimeSeriesGenerator:
         df = pd.DataFrame({
             'time': np.arange(self.length),
             'data': series,
-            'stationary': (np.zeros(self.length)).astype(int)
+            'stationary': (np.zeros(self.length)).astype(int),
+            'seasonal': np.zeros(self.length).astype(int),
         })
         return df, info
 
@@ -951,6 +955,7 @@ class TimeSeriesGenerator:
         info = {'type': 'seasonal', 'subtype': 'single_seasonality', 'period': period, 'amplitude': amplitude}
         df.loc[:,'data'] = series
         df.loc[:,'stationary'] = 0
+        df.loc[:, 'seasonal'] = 1
         df.loc[:,'single_seas'] = 1
         return df, info
 
@@ -985,6 +990,7 @@ class TimeSeriesGenerator:
         df.loc[:, 'data'] = series
         df.loc[:, 'multiple_seas'] = 1
         df.loc[:,'stationary'] = 0
+        df.loc[:, 'seasonal'] = 1
         return df, info
 
 
@@ -1005,12 +1011,14 @@ class TimeSeriesGenerator:
             series = self.z_normalize(series)
             df.loc[:, 'data'] = series
             df.loc[:, 'seasonal_base'] = 1
+            df.loc[:, 'seasonal'] = 1
         if kind == 'sarima':
             series, info = self.generate_sarima_series(self.length)
             if series is None: return None, None # Hata yakalama
             series = self.z_normalize(series)
             df.loc[:, 'data'] = series
             df.loc[:, 'seasonal_base'] = 1
+            df.loc[:, 'seasonal'] = 1
 
         return df, info
 
@@ -1033,7 +1041,8 @@ class TimeSeriesGenerator:
         df = pd.DataFrame({
             'time': np.arange(self.length),
             'data': series,
-            'stationary': (np.zeros(self.length)).astype(int)
+            'stationary': (np.zeros(self.length)).astype(int),
+            'seasonal': np.zeros(self.length).astype(int),
         })
         return df, info
 
@@ -1092,7 +1101,6 @@ class TimeSeriesGenerator:
         series = self.z_normalize(series)
         df.loc[:,'data'] = series
         df.loc[:,'stationary'] = 0
-        df.loc[:,'mean_shift'] = 1
         return df, info
 
 
@@ -1145,7 +1153,6 @@ class TimeSeriesGenerator:
     
         df.loc[:,'data'] = series
         df.loc[:,'stationary'] = 0
-        df.loc[:, 'variance_shift'] = 1
         return df, info
 
 
@@ -1233,8 +1240,6 @@ class TimeSeriesGenerator:
         # Update dataframe
         df.loc[:, 'data'] = series
         df.loc[:, 'stationary'] = 0
-        df.loc[:, 'trend_shift'] = 1
-
         return df, info
 
     def save_data(dataframes, filename):

@@ -17,7 +17,9 @@ def create_metadata_record(
     is_stationary=1,
     # === NEW: HIERARCHY ===
     primary_category=None,  # "stationary" | "trend" | "volatility" | ...
+    primary_label=None,
     sub_category=None,   # "linear_up" | "arch" | ...
+    sub_label=None,
     # === BASE ===
     base_series=None,
     base_process_type=None,
@@ -36,6 +38,7 @@ def create_metadata_record(
     difference=None,
     drift_value=None,
     # === SEASONALITY ===
+    is_seasonal=None,
     seasonality_type=None,
     seasonality_periods=None,
     seasonality_amplitudes=None,
@@ -85,7 +88,9 @@ def create_metadata_record(
         "label": label,
         "is_stationary": is_stationary,
         "primary_category": primary_category,
+        "primary_label": primary_label,
         "sub_category": sub_category,
+        "sub_label": sub_label,
         # === Base Process ===
         "base_series": base_series,
         "base_process_type": base_process_type,
@@ -104,6 +109,7 @@ def create_metadata_record(
         "difference": difference,
         "drift_value": drift_value,
         # === Seasonality ===
+        "is_seasonal" : is_seasonal,
         "seasonality_type": seasonality_type,
         "seasonality_periods": seasonality_periods,
         "seasonality_amplitudes": seasonality_amplitudes,

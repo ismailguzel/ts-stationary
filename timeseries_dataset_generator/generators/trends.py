@@ -12,7 +12,7 @@ This module contains functions to generate datasets with deterministic trends:
 import os
 import numpy as np
 from ..core.metadata import create_metadata_record, attach_metadata_columns_to_df
-from ..utils.helpers import save_and_cleanup, get_length_label
+from ..utils.helpers import save_and_cleanup, get_length_label, add_indices_column
 
 
 def _get_base_series(ts, kind):
@@ -60,7 +60,8 @@ def generate_linear_trend_dataset(
     count=5,
     length_range=(300, 500),
     sign=1,
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate linear trend dataset.
@@ -83,6 +84,8 @@ def generate_linear_trend_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -90,8 +93,11 @@ def generate_linear_trend_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="trend",
+            primary_label=2,
             sub_category="linear_up" if sign == 1 else "linear_down",
+            sub_label=0 if sign == 1 else 1,
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
@@ -101,7 +107,11 @@ def generate_linear_trend_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 
@@ -113,7 +123,8 @@ def generate_quadratic_trend_dataset(
     count=5,
     length_range=(300, 500),
     sign=1,
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate quadratic trend dataset.
@@ -134,6 +145,8 @@ def generate_quadratic_trend_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -141,8 +154,11 @@ def generate_quadratic_trend_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="trend",
+            primary_label=2,
             sub_category="quadratic",
+            sub_label=2,
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
@@ -153,7 +169,11 @@ def generate_quadratic_trend_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 
@@ -165,7 +185,8 @@ def generate_cubic_trend_dataset(
     count=5,
     length_range=(300, 500),
     sign=1,
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate cubic trend dataset.
@@ -186,6 +207,8 @@ def generate_cubic_trend_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -193,8 +216,11 @@ def generate_cubic_trend_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="trend",
+            primary_label=2,
             sub_category="cubic",
+            sub_label=3,
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
@@ -204,7 +230,11 @@ def generate_cubic_trend_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 
@@ -216,7 +246,8 @@ def generate_exponential_trend_dataset(
     count=5,
     length_range=(300, 500),
     sign=1,
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate exponential trend dataset.
@@ -237,6 +268,8 @@ def generate_exponential_trend_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -244,8 +277,11 @@ def generate_exponential_trend_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="trend",
+            primary_label=2,
             sub_category="exponential",
+            sub_label=4,
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
@@ -255,7 +291,11 @@ def generate_exponential_trend_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 
@@ -267,7 +307,8 @@ def generate_damped_trend_dataset(
     count=5,
     length_range=(300, 500),
     sign=1,
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate damped trend dataset.
@@ -288,6 +329,8 @@ def generate_damped_trend_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -295,8 +338,11 @@ def generate_damped_trend_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="trend",
+            primary_label=2,
             sub_category="damped",
+            sub_label=5,
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
@@ -305,7 +351,11 @@ def generate_damped_trend_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 
