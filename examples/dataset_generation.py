@@ -80,7 +80,10 @@ CONFIG = {
     'output_dir': 'generated-dataset',
     
     # Number of series to generate per configuration
-    'count': 10,
+    'count': 1,
+
+    # Whether to include indices of anomalies/structural breaks in the output DataFrames
+    'include_indices': True,  # Set to False to exclude indices columns
     
     # Dataset types to generate
     'stationary': {
@@ -107,21 +110,25 @@ CONFIG = {
     
     'collective_anomalies': {
         'enabled': True,
-        'multiple': {  # Only multiple collective anomalies (research focused)
+        'single': {
+            'enabled': True,
+            'length_ranges': ['short', 'medium', 'long']
+        },
+        'multiple': {
             'enabled': True,
             'length_ranges': ['long']  # Only long series for multiple cases
         }
     },
     
     'contextual_anomalies': {
-        'enabled': False,  # Disabled for research focused scenario
+        'enabled': True,  # Disabled for research focused scenario
         'single': {
-            'enabled': False,
-            'length_ranges': []
+            'enabled': True,
+            'length_ranges': ['short', 'medium', 'long']
         },
         'multiple': {
-            'enabled': False,
-            'length_ranges': []
+            'enabled': True,
+            'length_ranges': ['long']
         }
     },
     
@@ -136,31 +143,43 @@ CONFIG = {
     },
     
     'seasonality': {
-        'enabled': False,  # Disabled for research focused scenario
-        'types': [],  # Options: 'single', 'multiple', 'sarma', 'sarima'
-        'length_ranges': []
+        'enabled': True,  # Disabled for research focused scenario
+        'types': ['single', 'multiple', 'sarma', 'sarima'],  # Options: 'single', 'multiple', 'sarma', 'sarima'
+        'length_ranges': ['short', 'medium']
     },
     
     'structural_breaks': {
         'mean_shift': {
             'enabled': True,
-            'multiple': {  # Only multiple cases (research focused)
+            'multiple': { 
                 'enabled': True,
                 'length_ranges': ['long']  # Only long series
+            },
+            'single': {
+                'enabled': True,
+                'length_ranges': ['short', 'medium', 'long']
             }
         },
         'variance_shift': {
             'enabled': True,
-            'multiple': {  # Only multiple cases (research focused)
+            'multiple': { 
                 'enabled': True,
                 'length_ranges': ['long']  # Only long series
+            },
+            'single': {
+                'enabled': True,
+                'length_ranges': ['short', 'medium', 'long']
             }
         },
         'trend_shift': {
             'enabled': True,
-            'multiple': {  # Only multiple cases (research focused)
+            'multiple': { 
                 'enabled': True,
                 'length_ranges': ['long']  # Only long series
+            },
+            'single': {
+                'enabled': True,
+                'length_ranges': ['short', 'medium', 'long']
             }
         }
     }
@@ -308,7 +327,8 @@ if is_enabled('stationary'):
                 TimeSeriesGenerator,
                 folder=folder_path("stationary", base, length_label), 
                 count=CONFIG['count'], 
-                length_range=length_range
+                length_range=length_range,
+                is_loc=CONFIG['include_indices']
             )
     print()
 else:
@@ -342,7 +362,8 @@ if is_enabled('deterministic_trends'):
                         kind=base,
                         count=CONFIG['count'],
                         length_range=length_range,
-                        sign=sign
+                        sign=sign,
+                        is_loc=CONFIG['include_indices']
                     )
     print()
 else:
@@ -368,7 +389,8 @@ if is_enabled('point_anomalies'):
                         count=CONFIG['count'],
                         length_range=length_range,
                         anomaly_type='single',
-                        location=loc
+                        location=loc,
+                        is_loc=CONFIG['include_indices']
                     )
     
     # Multiple point anomalies
@@ -382,7 +404,8 @@ if is_enabled('point_anomalies'):
                     kind=base,
                     count=CONFIG['count'],
                     length_range=length_range,
-                    anomaly_type='multiple'
+                    anomaly_type='multiple',
+                    is_loc=CONFIG['include_indices']
                 )
     print()
 else:
@@ -393,6 +416,23 @@ else:
 
 if is_enabled('collective_anomalies'):
     print("✓ Generating: Collective anomalies")
+
+    # Single collective anomalies
+    if is_enabled('collective_anomalies', 'single'):
+        length_ranges_list = get_length_ranges('collective_anomalies', 'single')
+        for base in bases:
+            for length_label, length_range in length_ranges_list:
+                for loc in locations:
+                    generate_collective_anomaly_dataset(
+                        TimeSeriesGenerator,
+                        folder=folder_path("collective_anomaly_single", base, length_label),
+                        kind=base,
+                        count=CONFIG['count'],
+                        length_range=length_range,
+                        anomaly_type='single',
+                        location=loc,
+                        is_loc=CONFIG['include_indices']
+                    )
     
     # Multiple collective anomalies
     if is_enabled('collective_anomalies', 'multiple'):
@@ -408,6 +448,7 @@ if is_enabled('collective_anomalies'):
                     num_anomalies=n,
                     anomaly_type='multiple',
                     length_range=length_range,
+                    is_loc=CONFIG['include_indices']
                 )
     print()
 else:
@@ -429,7 +470,8 @@ if is_enabled('contextual_anomalies'):
                     folder=folder_path("contextual_anomaly", length_label),
                     count=CONFIG['count'],
                     length_range=length_range,
-                    location=loc
+                    location=loc,
+                    is_loc=CONFIG['include_indices']
                 )
     
     # Multiple contextual anomalies
@@ -444,6 +486,7 @@ if is_enabled('contextual_anomalies'):
                 num_anomalies=n,
                 anomaly_type='multiple',
                 length_range=length_range,
+                is_loc=CONFIG['include_indices']
             )
     print()
 else:
@@ -475,7 +518,8 @@ if is_enabled('stochastic'):
                 TimeSeriesGenerator,
                 folder=folder_path("stochastic", base, length_label), 
                 count=CONFIG['count'], 
-                length_range=length_range
+                length_range=length_range,
+                is_loc=CONFIG['include_indices']
             )
     print()
 else:
@@ -502,7 +546,8 @@ if is_enabled('volatility'):
                 TimeSeriesGenerator,
                 folder=folder_path("volatility", base, length_label), 
                 count=CONFIG['count'], 
-                length_range=length_range
+                length_range=length_range,
+                is_loc=CONFIG['include_indices']
             )
     print()
 else:
@@ -523,28 +568,32 @@ if is_enabled('seasonality'):
                     TimeSeriesGenerator,
                     folder=folder_path("single_seasonality", length_label),
                     count=CONFIG['count'],
-                    length_range=length_range
+                    length_range=length_range,
+                    is_loc=CONFIG['include_indices']
                 )
             elif seasonality_type == "multiple":
                 generate_multiple_seasonality_dataset(
                     TimeSeriesGenerator,
                     folder=folder_path("multiple_seasonality", length_label),
                     count=CONFIG['count'],
-                    length_range=length_range
+                    length_range=length_range,
+                    is_loc=CONFIG['include_indices']
                 )
             elif seasonality_type == "sarma":
                 generate_sarma_dataset(
                     TimeSeriesGenerator,
                     folder=folder_path("sarma_seasonality", length_label),
                     count=CONFIG['count'],
-                    length_range=length_range
+                    length_range=length_range,
+                    is_loc=CONFIG['include_indices']
                 )
             elif seasonality_type == "sarima":
                 generate_sarima_dataset(
                     TimeSeriesGenerator,
                     folder=folder_path("sarima_seasonality", length_label),
                     count=CONFIG['count'],
-                    length_range=length_range
+                    length_range=length_range,
+                    is_loc=CONFIG['include_indices']
                 )
     print()
 else:
@@ -559,6 +608,21 @@ print("✓ Generating: Structural breaks")
 # Mean Shift
 if is_enabled('structural_breaks', 'mean_shift'):
     print("  - Mean shift")
+    if is_enabled('structural_breaks', 'mean_shift', 'single'):
+        length_ranges_list = get_length_ranges('structural_breaks', 'mean_shift', 'single')
+        for base in bases:
+            for length_label, length_range in length_ranges_list:
+                n = 1
+                generate_mean_shift_dataset(
+                    TimeSeriesGenerator,
+                    folder=folder_path("mean_shift", base, length_label),
+                    kind=base,
+                    count=CONFIG['count'],
+                    break_type='single',
+                    length_range=length_range,
+                    is_loc=CONFIG['include_indices']
+                )
+
     if is_enabled('structural_breaks', 'mean_shift', 'multiple'):
         length_ranges_list = get_length_ranges('structural_breaks', 'mean_shift', 'multiple')
         for base in bases:
@@ -571,12 +635,28 @@ if is_enabled('structural_breaks', 'mean_shift'):
                     count=CONFIG['count'],
                     num_breaks=n,
                     break_type='multiple',
-                    length_range=length_range
+                    length_range=length_range,
+                    is_loc=CONFIG['include_indices']
                 )
 
 # Variance Shift
 if is_enabled('structural_breaks', 'variance_shift'):
     print("  - Variance shift")
+    if is_enabled('structural_breaks', 'variance_shift', 'single'):
+        length_ranges_list = get_length_ranges('structural_breaks', 'variance_shift', 'single')
+        for base in bases:
+            for length_label, length_range in length_ranges_list:
+                n = 1
+                generate_variance_shift_dataset(
+                    TimeSeriesGenerator,
+                    folder=folder_path("variance_shift", base, length_label),
+                    kind=base,
+                    count=CONFIG['count'],
+                    break_type='single',
+                    length_range=length_range,
+                    is_loc=CONFIG['include_indices']
+                )
+
     if is_enabled('structural_breaks', 'variance_shift', 'multiple'):
         length_ranges_list = get_length_ranges('structural_breaks', 'variance_shift', 'multiple')
         for base in bases:
@@ -589,12 +669,33 @@ if is_enabled('structural_breaks', 'variance_shift'):
                     count=CONFIG['count'],
                     num_breaks=n,
                     break_type='multiple',
-                    length_range=length_range
+                    length_range=length_range,
+                    is_loc=CONFIG['include_indices']
                 )
 
 # Trend Shift
 if is_enabled('structural_breaks', 'trend_shift'):
     print("  - Trend shift")
+    if is_enabled('structural_breaks', 'trend_shift', 'single'):
+        length_ranges_list = get_length_ranges('structural_breaks', 'trend_shift', 'single')
+        for base in bases:
+            for length_label, length_range in length_ranges_list:
+                for sign in signs:
+                    for change_type in change_types:
+                        for loc in locations:
+                            generate_trend_shift_dataset(
+                                TimeSeriesGenerator,
+                                folder=folder_path("trend_shift", base, length_label),
+                                kind=base,
+                                count=CONFIG['count'],
+                                change_types=[change_type],
+                                sign=sign,
+                                break_type='single',
+                                length_range=length_range,
+                                location=loc,
+                                is_loc=CONFIG['include_indices']
+                            )
+
     if is_enabled('structural_breaks', 'trend_shift', 'multiple'):
         length_ranges_list = get_length_ranges('structural_breaks', 'trend_shift', 'multiple')
         for base in bases:
@@ -611,7 +712,8 @@ if is_enabled('structural_breaks', 'trend_shift'):
                         change_types=change_type_samples,
                         sign=sign,
                         break_type='multiple',
-                        length_range=length_range
+                        length_range=length_range,
+                        is_loc=CONFIG['include_indices']
                     )
 
 print()

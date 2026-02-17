@@ -11,7 +11,7 @@ This module contains functions to generate datasets with volatility models:
 import os
 import numpy as np
 from ..core.metadata import create_metadata_record, attach_metadata_columns_to_df
-from ..utils.helpers import save_and_cleanup, get_length_label
+from ..utils.helpers import save_and_cleanup, get_length_label, add_indices_column
 
 
 def generate_arch_dataset(
@@ -19,7 +19,8 @@ def generate_arch_dataset(
     folder,
     count=20,
     length_range=(50, 100),
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate ARCH dataset.
@@ -37,14 +38,20 @@ def generate_arch_dataset(
         # Yeni metadata
         series_id = start_id + i
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
+
         record = create_metadata_record(
             series_id=series_id,
             length=length,
             label=f"arch_{l}",
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="volatility",
+            primary_label=5,
             sub_category="arch",
+            sub_label=0,
             base_series="arch",
             base_coefs=None,
             volatility_type="arch",
@@ -52,7 +59,12 @@ def generate_arch_dataset(
             volatility_omega=info.get("omega"),
         )
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
+
     save_and_cleanup(all_dfs, folder, count, f"arch_{l}")
 
 
@@ -61,7 +73,8 @@ def generate_garch_dataset(
     folder,
     count=20,
     length_range=(50, 100),
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate GARCH dataset.
@@ -96,14 +109,20 @@ def generate_garch_dataset(
         # Yeni metadata
         series_id = start_id + i
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
+
         record = create_metadata_record(
             series_id=series_id,
             length=length,
             label=f"garch_{l}",
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="volatility",
+            primary_label=5,
             sub_category="garch",
+            sub_label=0,
             base_series="garch",
             base_coefs=None,
             volatility_type="garch",
@@ -112,7 +131,12 @@ def generate_garch_dataset(
             volatility_omega=info.get("omega"),
         )
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
+
     save_and_cleanup(all_dfs, folder, count, f"garch_{l}")
 
 
@@ -121,7 +145,8 @@ def generate_egarch_dataset(
     folder,
     count=20,
     length_range=(50, 100),
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate EGARCH dataset.
@@ -156,14 +181,20 @@ def generate_egarch_dataset(
         # Yeni metadata
         series_id = start_id + i
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
+
         record = create_metadata_record(
             series_id=series_id,
             length=length,
             label=f"egarch_{l}",
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="volatility",
+            primary_label=5,
             sub_category="egarch",
+            sub_label=0,
             base_series="egarch",
             base_coefs=None,
             volatility_type="egarch",
@@ -173,8 +204,14 @@ def generate_egarch_dataset(
             volatility_theta=info.get("theta"),
             volatility_lambda=info.get("lambda"),
         )
+
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
+
     save_and_cleanup(all_dfs, folder, count, f"egarch_{l}")
 
 
@@ -183,7 +220,8 @@ def generate_aparch_dataset(
     folder,
     count=20,
     length_range=(50, 100),
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate APARCH dataset.
@@ -218,14 +256,20 @@ def generate_aparch_dataset(
         # Yeni metadata
         series_id = start_id + i
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
+
         record = create_metadata_record(
             series_id=series_id,
             length=length,
             label=f"aparch_{l}",
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="volatility",
+            primary_label=5,
             sub_category="aparch",
+            sub_label=0,
             base_series="aparch",
             base_coefs=None,
             volatility_type="aparch",
@@ -235,7 +279,13 @@ def generate_aparch_dataset(
             volatility_gamma=info.get("gamma"),
             volatility_delta=info.get("delta"),
         )
+
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
+            
     save_and_cleanup(all_dfs, folder, count, f"aparch_{l}")
 

@@ -10,7 +10,7 @@ This module contains functions to generate datasets with various anomaly types:
 import os
 import numpy as np
 from ..core.metadata import create_metadata_record, attach_metadata_columns_to_df
-from ..utils.helpers import save_and_cleanup, get_length_label
+from ..utils.helpers import save_and_cleanup, get_length_label, add_indices_column
 
 
 def _get_base_series(ts, kind):
@@ -59,7 +59,9 @@ def generate_point_anomaly_dataset(
     length_range=(300, 500),
     anomaly_type='single',
     location="middle",
-    start_id=1
+    num_anomalies=1,
+    start_id=1,
+    is_loc = None,
 ):
     """
     Generate point anomaly dataset.
@@ -96,6 +98,8 @@ def generate_point_anomaly_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -103,8 +107,11 @@ def generate_point_anomaly_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="anomaly",
+            primary_label=1,
             sub_category=subcat,
+            sub_label=0,
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
@@ -115,7 +122,11 @@ def generate_point_anomaly_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 
@@ -130,7 +141,8 @@ def generate_collective_anomaly_dataset(
     location="middle",              
     num_anomalies=2,
     scale_factor=1,
-    start_id=1
+    start_id=1,
+    is_loc = None
 ):
     """
     Generate collective anomaly dataset.
@@ -150,12 +162,14 @@ def generate_collective_anomaly_dataset(
             loc = location if location else np.random.choice(['beginning', 'middle', 'end'])
             df, info_anom = ts.generate_collective_anomalies(
                 df, num_anomalies=1, location=loc, scale_factor=scale_factor
+                
             )
             label = f"{kind}_single_collective_anomaly_{loc}_{l}"
             subcat = "collective_single"
             location_meta = f"{info_anom['location']}"
-            anomaly_indices = {"starts": info_anom['starts'].tolist() if hasattr(info_anom['starts'], 'tolist') else info_anom['starts'],
-                               "ends": info_anom['ends'].tolist() if hasattr(info_anom['ends'], 'tolist') else info_anom['ends']}
+            anomaly_starts = info_anom['starts']
+            anomaly_ends = info_anom['ends']
+            anomaly_indices = [anomaly_starts.tolist(),anomaly_ends.tolist()]
             anomaly_count = 1
         elif anomaly_type == 'multiple':
             k = max(2, int(num_anomalies))
@@ -165,8 +179,9 @@ def generate_collective_anomaly_dataset(
             label = f"{kind}_multiple_collective_anomalies_{l}"
             subcat = "collective_multiple"
             location_meta = "multiple"
-            anomaly_indices = {"starts": info_anom['starts'].tolist() if hasattr(info_anom['starts'], 'tolist') else info_anom['starts'],
-                               "ends": info_anom['ends'].tolist() if hasattr(info_anom['ends'], 'tolist') else info_anom['ends']}
+            anomaly_starts = info_anom['starts']
+            anomaly_ends = info_anom['ends']
+            anomaly_indices = [anomaly_starts.tolist(),anomaly_ends.tolist()]
             anomaly_count = k
         else:
             raise ValueError("Invalid anomaly_type. Must be 'single' or 'multiple'.")
@@ -174,6 +189,8 @@ def generate_collective_anomaly_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -181,8 +198,11 @@ def generate_collective_anomaly_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="anomaly",
+            primary_label=1,
             sub_category=subcat,
+            sub_label=1,
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
@@ -193,7 +213,11 @@ def generate_collective_anomaly_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 
@@ -207,7 +231,8 @@ def generate_contextual_anomaly_dataset(
     location="middle",              
     num_anomalies=2,
     scale_factor=1,
-    start_id=1
+    start_id=1,
+    is_loc = None
 ):
     """
     Generate contextual anomaly dataset.
@@ -236,8 +261,9 @@ def generate_contextual_anomaly_dataset(
             label = f"single_contextual_anomaly_{loc}_{l}"
             subcat = "contextual_single"
             location_meta = f"{info2['location']}"
-            anomaly_indices = {"starts": info2['starts'].tolist() if hasattr(info2['starts'], 'tolist') else info2['starts'],
-                               "ends": info2['ends'].tolist() if hasattr(info2['ends'], 'tolist') else info2['ends']}
+            anomaly_starts = info2['starts']
+            anomaly_ends = info2['ends']
+            anomaly_indices = [anomaly_starts.tolist(),anomaly_ends.tolist()]
             anomaly_count = 1
         elif anomaly_type == 'multiple':
             k = max(2, int(num_anomalies))
@@ -250,8 +276,10 @@ def generate_contextual_anomaly_dataset(
             label = f"multiple_contextual_anomalies_{l}"
             subcat = "contextual_multiple"
             location_meta = "multiple"
-            anomaly_indices = {"starts": info2['starts'].tolist() if hasattr(info2['starts'], 'tolist') else info2['starts'],
-                               "ends": info2['ends'].tolist() if hasattr(info2['ends'], 'tolist') else info2['ends']}
+            anomaly_starts = info2['starts']
+            anomaly_ends = info2['ends']
+            anomaly_indices = [anomaly_starts.tolist(),anomaly_ends.tolist()]
+            anomaly_count = 1
             anomaly_count = k
         else:
             raise ValueError("Invalid anomaly_type. Must be 'single' or 'multiple'.")
@@ -259,6 +287,8 @@ def generate_contextual_anomaly_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -266,17 +296,23 @@ def generate_contextual_anomaly_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="anomaly",
+            primary_label=1,
             sub_category=subcat,
+            sub_label=2,
             anomaly_type=subcat,
             anomaly_count=anomaly_count,
-            anomaly_indices=anomaly_indices,
+            anomaly_indices=anomaly_indices,  
             location_contextual=location_meta,
             seasonality_periods=[info1['period']]
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, len(all_dfs), label)
-
