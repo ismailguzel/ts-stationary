@@ -11,7 +11,7 @@ This module contains functions to generate datasets with seasonality:
 import os
 import numpy as np
 from ..core.metadata import create_metadata_record, attach_metadata_columns_to_df
-from ..utils.helpers import save_and_cleanup, get_length_label
+from ..utils.helpers import save_and_cleanup, get_length_label, add_indices_column
 
 
 def generate_single_seasonality_dataset(
@@ -19,7 +19,8 @@ def generate_single_seasonality_dataset(
     folder,
     count=20,
     length_range=(50, 100),
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate single seasonality dataset.
@@ -41,20 +42,29 @@ def generate_single_seasonality_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
         df = df.drop(columns=['stationary'])
+        df = df.drop(columns=['seasonal'])
 
         record = create_metadata_record(
             series_id=series_id,
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="seasonality",
+            primary_label=4,
             sub_category="single",
+            sub_label=0,
             seasonality_periods=[period]
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
         
     save_and_cleanup(all_dfs, folder, len(all_dfs), label)
 
@@ -65,7 +75,8 @@ def generate_multiple_seasonality_dataset(
     count=20,
     num_components=2,
     length_range=(50, 100),
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate multiple seasonality dataset.
@@ -87,6 +98,8 @@ def generate_multiple_seasonality_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -94,13 +107,20 @@ def generate_multiple_seasonality_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="seasonality",
+            primary_label=4,
             sub_category="multiple",
+            sub_label=1,
             seasonality_periods=periods
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
         
     save_and_cleanup(all_dfs, folder, len(all_dfs), label)
 
@@ -110,7 +130,8 @@ def generate_sarma_dataset(
     folder,
     count=20,
     length_range=(50, 100),
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate SARMA (Seasonal ARMA) dataset.
@@ -137,6 +158,8 @@ def generate_sarma_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -144,8 +167,11 @@ def generate_sarma_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="seasonality",
+            primary_label=4,
             sub_category="sarma",
+            sub_label=2,
             base_series='sarma',
             seasonality_from_base=1,
             seasonality_periods=[period],
@@ -158,7 +184,11 @@ def generate_sarma_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, len(all_dfs), label)
 
@@ -168,7 +198,8 @@ def generate_sarima_dataset(
     folder,
     count=20,
     length_range=(50, 100),
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate SARIMA (Seasonal ARIMA) dataset.
@@ -195,6 +226,8 @@ def generate_sarima_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -202,8 +235,11 @@ def generate_sarima_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="seasonality",
+            primary_label=4,
             sub_category="sarima",
+            sub_label=3,
             base_series='sarima',
             seasonality_from_base=1,
             seasonality_periods=[period],
@@ -216,7 +252,11 @@ def generate_sarima_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, len(all_dfs), label)
 

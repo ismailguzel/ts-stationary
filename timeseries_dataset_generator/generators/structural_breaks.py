@@ -10,7 +10,7 @@ This module contains functions to generate datasets with structural breaks:
 import os
 import numpy as np
 from ..core.metadata import create_metadata_record, attach_metadata_columns_to_df
-from ..utils.helpers import save_and_cleanup, get_length_label
+from ..utils.helpers import save_and_cleanup, get_length_label, add_indices_column
 
 
 def _get_base_series(ts, kind):
@@ -63,7 +63,8 @@ def generate_mean_shift_dataset(
     num_breaks=2,
     scale_factor=1,
     seasonal_period=None,
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate mean shift dataset.
@@ -100,12 +101,15 @@ def generate_mean_shift_dataset(
             raise ValueError("Invalid break_type. Must be 'single' or 'multiple'.")
 
         shift_indices = info2['shift_indices']
+        print(type(shift_indices))
         shift_magnitudes = info2['shift_magnitudes']
         break_count_val = len(shift_indices)
 
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -113,8 +117,11 @@ def generate_mean_shift_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="structural_break",
+            primary_label=6,
             sub_category="mean_shift",
+            sub_label=0,
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
@@ -127,7 +134,12 @@ def generate_mean_shift_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 
@@ -144,7 +156,8 @@ def generate_variance_shift_dataset(
     num_breaks=2,
     scale_factor=1,
     seasonal_period=None,
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate variance shift dataset.
@@ -187,6 +200,8 @@ def generate_variance_shift_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -194,8 +209,11 @@ def generate_variance_shift_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="structural_break",
+            primary_label=6,
             sub_category="variance_shift",
+            sub_label=1,
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
@@ -208,7 +226,11 @@ def generate_variance_shift_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 
@@ -226,7 +248,8 @@ def generate_trend_shift_dataset(
     scale_factor=1,
     seasonal_period=None,
     sign=None,
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate trend shift dataset.
@@ -277,6 +300,8 @@ def generate_trend_shift_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -284,8 +309,11 @@ def generate_trend_shift_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="structural_break",
+            primary_label=6,
             sub_category="trend_shift",
+            sub_label=2,
             base_series=kind,
             base_coefs=base_coefs,
             order=base_order,
@@ -297,7 +325,11 @@ def generate_trend_shift_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 

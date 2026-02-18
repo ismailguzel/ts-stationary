@@ -11,6 +11,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from typing import Optional, List, Tuple, Dict, Union
+import ast
+import re
 
 
 # Set default style
@@ -66,44 +68,9 @@ def plot_single_series(
     ax.plot(series_data['time'], series_data['data'], 
             label='Time Series', linewidth=1.5, color='steelblue')
     
-    # Highlight anomalies
-    if highlight_anomalies:
-        # Point anomalies
-        if 'point_anom_single' in series_data.columns and series_data['point_anom_single'].any():
-            ax.axhspan(ax.get_ylim()[0], ax.get_ylim()[1], 
-                      alpha=0.1, color='red', label='Point Anomaly Present')
-        
-        if 'point_anom_multi' in series_data.columns and series_data['point_anom_multi'].any():
-            ax.axhspan(ax.get_ylim()[0], ax.get_ylim()[1], 
-                      alpha=0.1, color='orange', label='Multiple Point Anomalies')
-        
-        # Collective anomalies
-        if 'collect_anom' in series_data.columns and series_data['collect_anom'].any():
-            ax.axhspan(ax.get_ylim()[0], ax.get_ylim()[1], 
-                      alpha=0.1, color='purple', label='Collective Anomaly Present')
-        
-        # Contextual anomalies
-        if 'context_anom' in series_data.columns and series_data['context_anom'].any():
-            ax.axhspan(ax.get_ylim()[0], ax.get_ylim()[1], 
-                      alpha=0.1, color='pink', label='Contextual Anomaly Present')
-    
-    # Highlight structural breaks
-    if highlight_breaks:
-        # Mean shift
-        if 'mean_shift' in series_data.columns and series_data['mean_shift'].any():
-            ax.axhspan(ax.get_ylim()[0], ax.get_ylim()[1], 
-                      alpha=0.1, color='green', label='Mean Shift Present')
-        
-        # Variance shift
-        if 'var_shift' in series_data.columns and series_data['var_shift'].any():
-            ax.axhspan(ax.get_ylim()[0], ax.get_ylim()[1], 
-                      alpha=0.1, color='yellow', label='Variance Shift Present')
-        
-        # Trend shift
-        if 'trend_shift' in series_data.columns and series_data['trend_shift'].any():
-            ax.axhspan(ax.get_ylim()[0], ax.get_ylim()[1], 
-                      alpha=0.1, color='cyan', label='Trend Shift Present')
-    
+    if highlight_anomalies or highlight_breaks:
+        mark_anom_and_breaks(series_data, highlight_anomalies, highlight_breaks,ax)
+         
     ax.set_xlabel('Time', fontsize=12)
     ax.set_ylabel('Value', fontsize=12)
     
@@ -123,6 +90,95 @@ def plot_single_series(
     
     return fig
 
+def mark_anom_and_breaks(
+    series_data,
+    highlight_anomalies: bool = True,
+    highlight_breaks: bool = True,
+    ax=None):
+
+    # Highlight anomalies
+    if highlight_anomalies:
+        # Point anomalies
+        if series_data["primary_label"].iloc[0] == 1 and series_data["sub_label"].iloc[0] == 0:
+            x = series_data["time"].to_numpy()
+            anom = series_data["anomaly_indices"].dropna().iloc[0]
+
+            if isinstance(anom, str):
+                anom = ast.literal_eval(anom)
+
+            anom = np.asarray(anom, dtype=int)
+
+            # keep only valid indices (avoid crashes)
+            anom = anom[(anom >= 0) & (anom < len(x))]
+
+            # plot anomaly points as red dots
+            ax.scatter(series_data["time"].iloc[anom],series_data["data"].iloc[anom],
+            color="red", s=25, zorder=5, label="Point Anomaly")
+
+        
+        # Collective anomalies
+        if series_data["primary_label"].iloc[0] == 1 and series_data["sub_label"].iloc[0] == 1:
+            x = series_data["time"].to_numpy()
+            anom = series_data["anomaly_indices"].dropna().iloc[0]
+    
+            if isinstance(anom, str):
+                anom = ast.literal_eval(anom)
+
+            starts, ends = anom
+
+            labeled = False
+            for s, e in zip(starts, ends):
+                ax.axvspan(x[s], x[e], alpha=0.15, color="orange",
+                           label="Collective Anomaly" if not labeled else None)
+                labeled = True
+        
+        # Contextual anomalies
+        if series_data["primary_label"].iloc[0] == 1 and series_data["sub_label"].iloc[0] == 2:
+            x = series_data["time"].to_numpy()
+            anom = series_data["anomaly_indices"].dropna().iloc[0]
+    
+            if isinstance(anom, str):
+                anom = ast.literal_eval(anom)
+
+            starts, ends = anom
+
+            labeled = False
+            for s, e in zip(starts, ends):
+                ax.axvspan(x[s], x[e], alpha=0.15, color="orange",
+                           label="Contextual Anomaly" if not labeled else None)
+                labeled = True
+    
+    # Highlight structural breaks
+    if highlight_breaks:
+        if series_data["primary_label"].iloc[0] ==6:
+            x = series_data["time"].to_numpy()
+            n = len(x)
+            bs = series_data["break_indices"].iloc[0]
+            if isinstance(bs, str):
+                breaks = list(map(int, re.findall(r"int\d+\((-?\d+)\)", bs)))
+                if not breaks:
+                    breaks = list(map(int, re.findall(r"-?\d+", bs)))
+            else:
+                breaks = [int(b) for b in bs]
+
+            breaks = sorted(set(b for b in breaks if 0 <= b < n))
+            labeled = False
+            if series_data["sub_label"].iloc[0] == 0:
+                label = "Mean Shift"
+            elif series_data["sub_label"].iloc[0] == 1:
+                label = "Variance Shift"
+            elif series_data["sub_label"].iloc[0] == 2:
+                label = "Trend Shift"
+            for k, b in enumerate(breaks):
+                alpha = min(0.06 + 0.06 * k, 0.35)  # darker as k increases
+                ax.axvspan(x[b], x[-1], color="orange", alpha=alpha,
+                        label=f"{label}" if not labeled else None)
+                labeled = True
+
+            # optional: mark exact start locations
+            for k, b in enumerate(breaks):
+                ax.axvline(x[b], color="gray", linestyle="--", linewidth=1,
+                        label="Break start" if k == 0 else None)
 
 def plot_multiple_series(
     df: pd.DataFrame,

@@ -12,7 +12,7 @@ This module contains functions to generate datasets with stochastic trends:
 import os
 import numpy as np
 from ..core.metadata import create_metadata_record, attach_metadata_columns_to_df
-from ..utils.helpers import save_and_cleanup, get_length_label
+from ..utils.helpers import save_and_cleanup, get_length_label, add_indices_column
 
 
 def generate_random_walk_dataset(
@@ -20,7 +20,8 @@ def generate_random_walk_dataset(
     folder,
     count=20,
     length_range=(50, 100),
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate random walk dataset.
@@ -58,6 +59,8 @@ def generate_random_walk_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -66,7 +69,9 @@ def generate_random_walk_dataset(
             label=label,
             is_stationary=is_stat_flag,
             primary_category="stochastic",
+            primary_label=3,
             sub_category="rw",
+            sub_label=0,
             base_series="rw",
             base_coefs=base_coefs,
             order=base_order,
@@ -74,7 +79,11 @@ def generate_random_walk_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 
@@ -84,7 +93,8 @@ def generate_random_walk_with_drift_dataset(
     folder,
     count=20,
     length_range=(50, 100),
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate random walk with drift dataset.
@@ -122,6 +132,8 @@ def generate_random_walk_with_drift_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal']) 
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -130,7 +142,9 @@ def generate_random_walk_with_drift_dataset(
             label=label,
             is_stationary=is_stat_flag,
             primary_category="stochastic",
+            primary_label=3,
             sub_category="rwd",
+            sub_label=0,
             base_series="rwd",
             base_coefs=base_coefs,
             order=base_order,
@@ -139,7 +153,11 @@ def generate_random_walk_with_drift_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 
@@ -149,7 +167,8 @@ def generate_ima_dataset(
     folder,
     count=20,
     length_range=(50, 100),
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate IMA (Integrated Moving Average) dataset.
@@ -188,6 +207,8 @@ def generate_ima_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -195,8 +216,11 @@ def generate_ima_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="stochastic",
+            primary_label=3,
             sub_category="ima",
+            sub_label=0,
             base_series="ima",
             order=base_order,
             base_coefs=base_coefs,
@@ -205,7 +229,11 @@ def generate_ima_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 
@@ -215,7 +243,8 @@ def generate_ari_dataset(
     folder,
     count=20,
     length_range=(50, 100),
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate ARI (Autoregressive Integrated) dataset.
@@ -254,6 +283,8 @@ def generate_ari_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -261,7 +292,10 @@ def generate_ari_dataset(
             length=length,
             label=label,
             is_stationary=is_stat_flag,
+            is_seasonal=is_seasonal_flag,
             primary_category="stochastic",
+            primary_label=3,
+            sub_label=0,
             sub_category="ari",
             base_series="ari",
             order=base_order,
@@ -271,7 +305,11 @@ def generate_ari_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 
@@ -281,7 +319,8 @@ def generate_arima_dataset(
     folder,
     count=20,
     length_range=(50, 100),
-    start_id=1
+    start_id=1,
+    is_loc=None
 ):
     """
     Generate ARIMA (Autoregressive Integrated Moving Average) dataset.
@@ -320,6 +359,8 @@ def generate_arima_dataset(
         series_id = start_id + i
 
         is_stat_flag = int(df['stationary'].iloc[0])
+        is_seasonal_flag = int(df['seasonal'].iloc[0])
+        df = df.drop(columns=['seasonal'])
         df = df.drop(columns=['stationary'])
 
         record = create_metadata_record(
@@ -328,6 +369,8 @@ def generate_arima_dataset(
             label=label,
             is_stationary=is_stat_flag,
             primary_category="stochastic",
+            primary_label=3,
+            sub_label=0,
             sub_category="arima",
             base_series="arima",
             order=base_order,
@@ -337,7 +380,11 @@ def generate_arima_dataset(
         )
 
         df_with_meta = attach_metadata_columns_to_df(df, record)
-        all_dfs.append(df_with_meta)
+        if is_loc:
+            df_with_meta_and_indices = add_indices_column(df_with_meta)
+            all_dfs.append(df_with_meta_and_indices)
+        else:
+            all_dfs.append(df_with_meta)
 
     save_and_cleanup(all_dfs, folder, count, label)
 

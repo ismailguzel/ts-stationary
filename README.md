@@ -4,26 +4,10 @@ A modular Python library for generating synthetic time series datasets with vari
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18513505.svg)](https://doi.org/10.5281/zenodo.18513505)
 
 ## Overview
 
 This library provides a comprehensive toolkit for generating synthetic time series data with various statistical properties and patterns. It's designed for researchers, data scientists, and developers who need reproducible, well-documented time series datasets for testing, validation, or educational purposes.
-
-## Published Dataset
-
-**TSBench**: A large-scale benchmark dataset generated using this library has been published on Zenodo and is available for research and benchmarking purposes.
-
-- **Dataset Name**: TSBench Dataset: A Benchmark for Time Series Stationarity and Structural Analysis
-- **DOI**: [10.5281/zenodo.18513505](https://doi.org/10.5281/zenodo.18513505)
-- **Size**: 120,000 unique univariate time series (23.8 GB total)
-- **Conference**: Submitted to [KDD 2026 Datasets and Benchmark Track](https://kdd2026.kdd.org/)
-
-The dataset includes:
-- **Generated_Data.zip** (10.2 GB): Time series with single primary properties
-- **combinations.rar** (13.6 GB): Complex time series with multiple coexisting characteristics
-
-Access the dataset at: [https://zenodo.org/records/18513505](https://zenodo.org/records/18513505)
 
 ## Features
 
@@ -282,39 +266,22 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Citation
 
-If you use this library or the TSBench dataset in your research, please cite:
+If you use this library in your research, please cite:
 
-### For the TSBench Dataset:
-```bibtex
-@dataset{tsbench2026,
-  author = {Gür, Kerem and Yazıcı, Pınar Cemre and Erkaya, Pelin and 
-            Türkmen, Yağmur and Baytak, Berke and Güzel, İsmail and 
-            Karagöz, Pınar and Yozgatlıgil, Ceylan},
-  title = {{TSBench: A Comprehensive Benchmark Dataset for Time Series 
-            Stationarity and Structural Analysis}},
-  year = {2026},
-  publisher = {Zenodo},
-  doi = {10.5281/zenodo.18513505},
-  url = {https://doi.org/10.5281/zenodo.18513505}
-}
-```
-
-### For the Library:
 ```bibtex
 @software{timeseries_dataset_generator,
-  author = {TS-Stationary Project Team},
+  author = {TS-Stationary Project Team, TUBITAK 1001 Project No. 124F095},
   title = {Time Series Dataset Generator},
-  year = {2026},
-  url = {https://github.com/ismailguzel/ts-stationary},
-  note = {TUBITAK Grant No. 124F095}
+  year = {2025},
+  url = {https://github.com/ismailguzel/ts-stationary}
 }
 ```
 
-## Funding
+## Acknowledgments
 
-This work is supported by:
-- **TÜBİTAK** (The Scientific and Technological Research Council of Türkiye) - Grant No. **124F095**
-- **METU** (Middle East Technical University) Scientific Research Projects Coordination Unit - Grant No. **GAP-109-2023-11361**
+- Built with `numpy`, `pandas`, `statsmodels`, and `arch`
+- Refactored from a monolithic 1999-line file into a modular library
+- Designed for reproducibility and ease of use
 
 ## Contact
 
